@@ -2,7 +2,7 @@ package main;
 import java.util.*;
 
 public class Molecules {
-    Map<String, Element> storage = new HashMap<>();
+    Map<Integer, Integer> storage = new HashMap<>();
     ArrayList<Integer> offset = new ArrayList<>();
     public void parse(String molecule) {
         if (molecule == null || molecule.isBlank()) {
@@ -55,13 +55,13 @@ public class Molecules {
             }
             if (number == 0) number = 1;
         }
-        Element foundElement = storage.get(name);
-        if (foundElement != null) {
-            foundElement.number += number;
+        Integer numberInPTable = (Integer) Utils.numberInPTable(name);
+        Integer foundNumber = storage.get(numberInPTable);
+        if (foundNumber != null) {
+            number += foundNumber;
         }
-        else {
-            storage.put(name, new Element(name, number));
-        }
+            storage.put(numberInPTable, number);
+
     }
 
     public String toString() {
@@ -107,6 +107,14 @@ public class Molecules {
                     if (x.equals(s)) return true;
                 }
                 return false;
+        }
+        public static Object numberInPTable (String s){
+            int number = 1;
+            for (String x : SYMBOLS) {
+                if (x.equals(s)) return number;
+            number++;
+            }
+            return null;
         }
     }
 }

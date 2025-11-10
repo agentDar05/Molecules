@@ -7,8 +7,9 @@ import org.junit.jupiter.api.Test;
 public class MoleculesTest {
     public static void main(String[] args) {
         Molecules m = new Molecules();
-        for (int i = 0; i<1000; i++)
-            m.parse("HCl");
+        for (int i = 0; i < 10_000_000; i++) {
+            m.parse("H3PO4Cl100OOH");
+        }
     }
     @Test
     public void parseElementWithNegativeNumber() {
@@ -22,30 +23,23 @@ public class MoleculesTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> m.parse("H0"));
     }
     @Test
-    public void a() {
-        Molecules m = new Molecules();
-        for (int i = 0; i < 10_000_000; i++) {
-            m.parse("H3PO4Cl100OOH");
-        }
-    }
-    @Test
     public void parseOneElement() {
         Molecules m = new Molecules();
         m.parse("O");
-        Assertions.assertEquals("{O=O1}", m.toString());
+        Assertions.assertEquals("{8=1}", m.toString());
     }
 //
     @Test
     public void parseElementWithTwoLetters() {
         Molecules m = new Molecules();
         m.parse("Cl");
-        Assertions.assertEquals("{Cl=Cl1}", m.toString());
+        Assertions.assertEquals("{17=1}", m.toString());
     }
     @Test
     public void parseMoleculeWithoutRepeatingElements() {
         Molecules m = new Molecules();
         m.parse("H2SPO4");
-        Assertions.assertEquals("{P=P1, S=S1, H=H2, O=O4}", m.toString());
+        Assertions.assertEquals("{16=1, 1=2, 8=4, 15=1}", m.toString());
     }
     @Test
     public void parseMolecules() {
@@ -53,7 +47,7 @@ public class MoleculesTest {
         m.parse("H2SPO4");
         m.parse("Cl1Br8");
 
-        Assertions.assertEquals("{P=P1, Br=Br8, S=S1, H=H2, Cl=Cl1, O=O4}", m.toString());
+        Assertions.assertEquals("{16=1, 1=2, 17=1, 35=8, 8=4, 15=1}", m.toString());
     }
     @Test
     public void parseSameElement2Times() {
@@ -61,13 +55,13 @@ public class MoleculesTest {
         m.parse("Cl2");
         m.parse("Cl");
 
-        Assertions.assertEquals("{Cl=Cl3}", m.toString());
+        Assertions.assertEquals("{17=3}", m.toString());
     }
     @Test
     public void parseElementWith2DigitNumber() {
         Molecules m = new Molecules();
         m.parse("Cl12");
-        Assertions.assertEquals("{Cl=Cl12}", m.toString());
+        Assertions.assertEquals("{17=12}", m.toString());
     }
     @Test
     public void emptyMoleculeToStringReturnsEmptyString() {
@@ -87,7 +81,7 @@ public class MoleculesTest {
         m.parse("H");
         m.parse("Zn");
         m.parse("Pt");
-        Assertions.assertEquals("{Zn=Zn1, Pt=Pt1, H=H1, Cl=Cl1}", m.toString());
+        Assertions.assertEquals("{17=1, 1=1, 30=1, 78=1}", m.toString());
     }
     @Test
     public void doesntStoreNotExistingElements() {
