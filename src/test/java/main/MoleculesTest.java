@@ -32,20 +32,20 @@ public class MoleculesTest {
     public void parseOneElement() {
         Molecules m = new Molecules();
         m.parse("O");
-        Assertions.assertEquals("O1", m.toString());
+        Assertions.assertEquals("{O=O1}", m.toString());
     }
 //
     @Test
     public void parseElementWithTwoLetters() {
         Molecules m = new Molecules();
         m.parse("Cl");
-        Assertions.assertEquals("Cl1", m.toString());
+        Assertions.assertEquals("{Cl=Cl1}", m.toString());
     }
     @Test
     public void parseMoleculeWithoutRepeatingElements() {
         Molecules m = new Molecules();
         m.parse("H2SPO4");
-        Assertions.assertEquals("H2 S1 P1 O4", m.toString());
+        Assertions.assertEquals("{P=P1, S=S1, H=H2, O=O4}", m.toString());
     }
     @Test
     public void parseMolecules() {
@@ -53,7 +53,7 @@ public class MoleculesTest {
         m.parse("H2SPO4");
         m.parse("Cl1Br8");
 
-        Assertions.assertEquals("H2 S1 P1 O4 Cl1 Br8", m.toString());
+        Assertions.assertEquals("{P=P1, Br=Br8, S=S1, H=H2, Cl=Cl1, O=O4}", m.toString());
     }
     @Test
     public void parseSameElement2Times() {
@@ -61,18 +61,18 @@ public class MoleculesTest {
         m.parse("Cl2");
         m.parse("Cl");
 
-        Assertions.assertEquals("Cl3", m.toString());
+        Assertions.assertEquals("{Cl=Cl3}", m.toString());
     }
     @Test
     public void parseElementWith2DigitNumber() {
         Molecules m = new Molecules();
         m.parse("Cl12");
-        Assertions.assertEquals("Cl12", m.toString());
+        Assertions.assertEquals("{Cl=Cl12}", m.toString());
     }
     @Test
     public void emptyMoleculeToStringReturnsEmptyString() {
         Molecules m = new Molecules();
-        Assertions.assertEquals("", m.toString());
+        Assertions.assertEquals("{}", m.toString());
     }
     @Test
     public void parseNullAndEmptyString() {
@@ -80,4 +80,23 @@ public class MoleculesTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> m.parse(""));
         Assertions.assertThrows(IllegalArgumentException.class, () -> m.parse(null));
     }
+    @Test
+    public void findsElement() {
+        Molecules m = new Molecules();
+        m.parse("Cl");
+        m.parse("H");
+        m.parse("Zn");
+        m.parse("Pt");
+        Assertions.assertEquals("{Zn=Zn1, Pt=Pt1, H=H1, Cl=Cl1}", m.toString());
+    }
+    @Test
+    public void doesntStoreNotExistingElements() {
+        Molecules m = new Molecules();
+        m.parse("Q");
+        m.parse("Hi");
+        m.parse("Ok");
+        m.parse("L");
+        Assertions.assertEquals("{}", m.toString());
+    }
+
 }
