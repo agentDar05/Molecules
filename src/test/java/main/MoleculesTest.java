@@ -9,9 +9,7 @@ public class MoleculesTest {
         Molecules m = new Molecules();
         for (int i = 0; i<1000; i++)
             m.parse("HCl");
-
     }
-
     @Test
     public void parseElementWithNegativeNumber() {
         Molecules m = new Molecules();
@@ -26,8 +24,8 @@ public class MoleculesTest {
     @Test
     public void a() {
         Molecules m = new Molecules();
-        for (int i = 0; i < 1000000; i++) {
-            m.parse("O");
+        for (int i = 0; i < 10_000_000; i++) {
+            m.parse("H3PO4Cl100OOH");
         }
     }
     @Test

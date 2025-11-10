@@ -16,8 +16,8 @@ public class MoleculesParserBenchmark {
     @Measurement(iterations = 3, time = 5)
     @Fork(1)
     public void test1(Data data) {
-        data.m.parse("H3PO4Cl100OOH");
-    }
+        data.m.parse("H3PO4Cl100OOHZnTmSUPtAl");
+    } // H4 P1 O6 Cl100 Zn Tm S U Pt Al
 
     @State(Scope.Benchmark)
     public static class Data {

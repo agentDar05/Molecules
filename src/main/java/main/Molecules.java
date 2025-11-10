@@ -2,7 +2,7 @@ package main;
 import java.util.*;
 
 public class Molecules {
-    Storage storage = new Storage();
+    Map<String, Element> storage = new HashMap<>();
     ArrayList<Integer> offset = new ArrayList<>();
     public void parse(String molecule) {
         if (molecule == null || molecule.isBlank()) {
@@ -27,34 +27,39 @@ public class Molecules {
             throw new IllegalArgumentException("Invalid input for store");
         }
 
-        int i = 0;
-        while (i < length && Utils.isLetter(mf.charAt(offset + i))) i++;
+        int pos = offset;
+        int end = offset + length;
 
-        String name = mf.substring(offset, offset + i);
+        int nameStart = pos;
+        pos++;
+        while (pos < end && Utils.isLetter(mf.charAt(pos))) pos++;
+        int nameEnd = pos;
+
+        int nameLen = nameEnd - nameStart;
+        char[] nameChars = new char[nameLen];
+        mf.getChars(nameStart, nameEnd, nameChars, 0);
+        String name = new String(nameChars);
 
         int number = 0;
-        if (i >= length) {
+        if (pos == end) {
             number = 1;
         } else {
-            char currDigit = mf.charAt(offset + i);
-            if (currDigit == '0') {
-                throw new IllegalArgumentException("Number of element cannot be 0. Currently: "
-                        + mf.substring(offset, offset + length));
+            if (mf.charAt(pos) == '0') {
+                throw new IllegalArgumentException("Number of element cannot be 0: " + name);
             }
-            while (i < length && Utils.isDigit(mf.charAt(offset + i))) {
-                number = number * 10 + (mf.charAt(offset + i) - '0');
-                i++;
+            while (pos < end && Utils.isDigit(mf.charAt(pos))) {
+                number = number * 10 + (mf.charAt(pos) - '0');
+                pos++;
             }
+            if (number == 0) number = 1;
         }
-        for (int j = 0; j < storage.size(); j++) {
-            Element e = (Element) storage.get(j);
-            if (e.name.equals(name)) {
-                e.number += number;
-                return;
-            }
+        Element foundElement = storage.get(name);
+        if (foundElement != null) {
+            foundElement.number += number;
         }
-
-        storage.add(new Element(name, number));
+        else {
+            storage.put(name, new Element(name, number));
+        }
     }
 
     public String toString() {
@@ -83,46 +88,6 @@ public class Molecules {
 
         public static boolean isLetter(char ch) {
             return (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z');
-        }
-    }
-
-    static class Storage {
-        private Object[] data;
-        private int size;
-
-        public Storage() {
-            this.size = 0;
-            data = new Object[5];
-        }
-
-        public void add(Element obj) {
-            if (size == data.length) {
-                resizeAndCopy();
-            }
-            data[size++] = obj;
-        }
-
-        private void resizeAndCopy() {
-            Object[] newData = new Object[data.length * 2];
-            System.arraycopy(data, 0, newData, 0, data.length);
-            data = newData;
-        }
-
-        public String toString() {
-            StringBuilder output = new StringBuilder();
-            for (int i = 0; i < size; i++) {
-                if (i > 0) output.append(" ");
-                output.append(get(i));
-            }
-            return output.toString();
-        }
-
-        public Object get(int idx) {
-            return data[idx];
-        }
-
-        public int size() {
-            return size;
         }
     }
 }
