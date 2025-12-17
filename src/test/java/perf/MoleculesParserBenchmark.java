@@ -1,6 +1,6 @@
 package perf;
 
-import main.Molecules;
+import main.Parser;
 import org.openjdk.jmh.annotations.*;
 
 import java.io.IOException;
@@ -21,6 +21,6 @@ public class MoleculesParserBenchmark {
 
     @State(Scope.Benchmark)
     public static class Data {
-        final Molecules m = new Molecules();
+        final Parser m = new Parser();
     }
 }
