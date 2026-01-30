@@ -56,5 +56,5 @@ class Main{
 
                 System.out.println("BFS:");
                 m.bfs("O");
-            }
+           }
 }

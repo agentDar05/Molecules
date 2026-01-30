@@ -1,13 +1,19 @@
 package main;
+
 import java.util.*;
+
 public class Parser {
     Map<Integer, Integer> storage = new HashMap<>();
     ArrayList<Integer> offset = new ArrayList<>();
+    static final byte C = 6;
+    static final byte O = 8;
+    static final byte H = 1;
+
     public void parse(String molecule) {
         if (molecule == null || molecule.isBlank()) {
             throw new IllegalArgumentException("Invalid molecule: " + molecule);
         }
-        if (!Utils.isValid(molecule)){
+        if (!Utils.isValid(molecule)) {
             return;
         }
         int i = 0;
@@ -30,8 +36,7 @@ public class Parser {
                 }
 
                 i = j;
-            }
-            else if (Character.isUpperCase(c)) {
+            } else if (Character.isUpperCase(c)) {
                 int start = i;
                 do i++;
                 while (i < molecule.length() && Utils.isLetter(molecule.charAt(i)));
@@ -40,12 +45,12 @@ public class Parser {
 
                 store(molecule, start, length);
                 offset.add(start);
-            }
-            else {
+            } else {
                 throw new IllegalArgumentException("Invalid character at position " + i + ": " + c);
             }
         }
     }
+
     public void store(String mf, int offset, int length) {
         if (mf == null || length <= 0 || offset < 0 || offset + length > mf.length()) {
             throw new IllegalArgumentException("Invalid input for store");
@@ -60,7 +65,7 @@ public class Parser {
         char[] nameChars = new char[nameLen];
         mf.getChars(nameStart, nameEnd, nameChars, 0);
         String name = new String(nameChars);
-        if (!Utils.existsInPTable(name)){
+        if (!Utils.existsInPTable(name)) {
             return;
         }
         int number = 0;
@@ -83,12 +88,15 @@ public class Parser {
         }
         storage.put(atomicNumber, number);
     }
-    public double calculateMW(){
+
+    public double calculateMW() {
         return Utils.calculateMW(storage);
     }
-    public double calculateEMW(){
+
+    public double calculateEMW() {
         return Utils.calculateMonoisotopic(storage);
     }
+
     @Override
     public String toString() {
         if (storage.isEmpty()) return "";
@@ -117,8 +125,9 @@ public class Parser {
             return name + number;
         }
     }
+
     static class Utils {
-        final static String[] SYMBOLS = new String[] {
+        final static String[] SYMBOLS = new String[]{
                 "H", "He",
                 "Li", "Be", "B", "C", "N", "O", "F", "Ne",
                 "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar",
@@ -178,6 +187,7 @@ public class Parser {
                 PT_MAP.put(SYMBOLS[i], i);
             }
         }
+
         public static boolean isDigit(char ch) {
             return ch >= '0' && ch <= '9';
         }
@@ -185,9 +195,11 @@ public class Parser {
         public static boolean isLetter(char ch) {
             return (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z');
         }
+
         public static boolean existsInPTable(String s) {
             return PT_MAP.containsKey(s); // O(1)
         }
+
         public static int numberInPTable(String s) {
             Integer e = PT_MAP.get(s);// O(1)
             if (e == null)
@@ -195,6 +207,7 @@ public class Parser {
             return e;
 
         }
+
         public static double calculateMW(Map<Integer, Integer> elementsInMap) {
             double mw = 0.0;
             for (Map.Entry<Integer, Integer> element : elementsInMap.entrySet()) {
@@ -207,7 +220,7 @@ public class Parser {
         }
 
         /**
-         *EMW is the average mass of a molecule based on the natural mix of isotopes.
+         * EMW is the average mass of a molecule based on the natural mix of isotopes.
          * Monoisotopic mass is the mass of the same molecule if you pretend every atom is only the lightest, most common isotope.
          */
         public static double calculateMonoisotopic(Map<Integer, Integer> elementsInMap) {
@@ -220,6 +233,7 @@ public class Parser {
             }
             return mw;
         }
+
         public static boolean isValid(String s) {
             int count = 0;
             for (int i = 0; i < s.length(); i++) {
@@ -235,6 +249,7 @@ public class Parser {
         }
 
     }
+
     private int findClosingBracket(String s, int open) {
         int depth = 1;
         for (int i = open + 1; i < s.length(); i++) {
@@ -244,4 +259,246 @@ public class Parser {
         }
         throw new IllegalArgumentException("Unmatched '(' at position " + open);
     }
+
+    public static void isAlcoholAdjacency(MoleculeWithAdjacencyList m){
+        MoleculeWithAdjacencyList oh = new MoleculeWithAdjacencyList();
+        oh.addAtom(H); // 0
+        oh.addAtom(O); // 1
+        oh.addAtom(C); // 2
+        oh.addBond(1, 0);
+        oh.addBond(2, 1);
+        MoleculeWithAdjacencyList.isSubgraph(oh, m);
+    }
+    public static void isAlcoholMatrix(MoleculeWithMatrix m){
+        MoleculeWithMatrix oh = new MoleculeWithMatrix();
+        oh.addAtom(H); // 0
+        oh.addAtom(O); // 1
+        oh.addAtom(C); // 2
+        oh.addBond(1, 0);
+        oh.addBond(2, 1);
+        MoleculeWithMatrix.isSubgraph(oh, m);
+    }
+    public static void isAlcoholVertices(MoleculeWithVertices m){
+        MoleculeWithVertices oh = new MoleculeWithVertices();
+        oh.addAtom(H); // 0
+        oh.addAtom(O); // 1
+        oh.addAtom(C); // 2
+        oh.addBond(1, 0);
+        oh.addBond(2, 1);
+        MoleculeWithVertices.isSubgraph(oh, m);
+    }
+    public static void isCarboxylicAcidAdjacency(MoleculeWithAdjacencyList m){
+        MoleculeWithAdjacencyList cooh = new MoleculeWithAdjacencyList();
+        cooh.addAtom(H); // 0
+        cooh.addAtom(O); // 1
+        cooh.addAtom(O); // 2
+        cooh.addAtom(C); // 3
+        cooh.addBond(3, 1);
+        cooh.addBond(3, 2);
+        cooh.addBond(2, 0);
+        MoleculeWithAdjacencyList.isSubgraph(cooh, m);
+    }
+    public static void isCarboxylicAcidMatrix(MoleculeWithMatrix m){
+        MoleculeWithMatrix cooh = new MoleculeWithMatrix();
+        cooh.addAtom(H); // 0
+        cooh.addAtom(O); // 1
+        cooh.addAtom(O); // 2
+        cooh.addAtom(C); // 3
+        cooh.addBond(3, 1);
+        cooh.addBond(3, 2);
+        cooh.addBond(2, 0);
+        MoleculeWithMatrix.isSubgraph(cooh, m);
+    }
+    public static void isCarboxylicAcidVertices(MoleculeWithVertices m){
+        MoleculeWithVertices cooh = new MoleculeWithVertices();
+        cooh.addAtom(H); // 0
+        cooh.addAtom(O); // 1
+        cooh.addAtom(O); // 2
+        cooh.addAtom(C); // 3
+        cooh.addBond(3, 1);
+        cooh.addBond(3, 2);
+        cooh.addBond(2, 0);
+        MoleculeWithVertices.isSubgraph(cooh, m);
+    }
+//    public static boolean isAlcohol(Molecule m) {
+//        for (int o : m.getIndexes((byte)8)) {
+//            boolean hasH = false;
+//            boolean hasC = false;
+//
+//            for (int i = 0; i < m.size(); i++) {
+//                if (!m.isConnected(o, i)) continue;
+//                if (m.getBondType(o, i) != BondType.SINGLE) continue;
+//
+//                byte e = m.getAtom(i);
+//                if (e == 1) hasH = true;
+//                if (e == 6) hasC = true;
+//            }
+//
+//            if (hasH && hasC) return true;
+//        }
+//        return false;
+//    }
+//
+//    public static boolean isAlcohol(MoleculeWithVertices m) {
+//        for (int i = 0; i < m.bonds.size(); i += 2) {
+//            int a = m.bonds.get(i);
+//            int b = m.bonds.get(i + 1);
+//            if (m.types.get(i / 2) != BondType.SINGLE) continue;
+//
+//            byte ea = m.vertices.get(a);
+//            byte eb = m.vertices.get(b);
+//
+//            if ((ea == 8 && eb == 1) || (ea == 1 && eb == 8)) {
+//                int o = ea == 8 ? a : b;
+//                for (int j = 0; j < m.bonds.size(); j += 2) {
+//                    int x = m.bonds.get(j);
+//                    int y = m.bonds.get(j + 1);
+//                    if (m.types.get(j / 2) != BondType.SINGLE) continue;
+//
+//                    if ((x == o && m.vertices.get(y) == 6) ||
+//                            (y == o && m.vertices.get(x) == 6))
+//                        return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
+//
+//    public static boolean isAlcohol(MoleculeWithAdjacencyList m) {
+//        for (int o : m.getIndexes((byte)8)) {
+//            boolean h = false;
+//            boolean c = false;
+//
+//            for (int n : m.bonds.get(o)) {
+//                if (m.types[o][n] != BondType.SINGLE) continue;
+//                if (m.atoms.get(n) == 1) h = true;
+//                if (m.atoms.get(n) == 6) c = true;
+//            }
+//
+//            if (h && c) return true;
+//        }
+//        return false;
+//    }
+//    public static boolean isAlcohol(MoleculeWithMatrix m) {
+//        for (int o : m.getIndexes((byte)8)) {
+//            boolean h = false;
+//            boolean c = false;
+//
+//            for (int i = 0; i < m.size(); i++) {
+//                if (!m.m[o][i]) continue;
+//                if (m.types[o][i] != BondType.SINGLE) continue;
+//
+//                if (m.atoms.get(i) == 1) h = true;
+//                if (m.atoms.get(i) == 6) c = true;
+//            }
+//
+//            if (h && c) return true;
+//        }
+//        return false;
+//    }
+
+//    public static boolean isCarboxylicAcid(MoleculeWithAdjacencyList m) {
+//        for (int c = 0; c < m.atoms.size(); c++) {
+//            if (m.atoms.get(c) != 6) continue;
+//            boolean hasDoubleO = false;
+//            boolean hasSingleOwithH = false;
+//            for (int i = 0; i < m.bonds.get(c).size(); i++) {
+//                int o = m.bonds.get(c).get(i);
+//                BondType bond = m.bondTypes.get(i);
+//                if (m.atoms.get(o) != 8) continue;
+//                if (bond == BondType.DOUBLE) hasDoubleO = true;
+//                if (bond == BondType.SINGLE) {
+//                    for (int j = 0; j < m.bonds.get(o).size(); j++) {
+//                        int h = m.bonds.get(o).get(j);
+//                        BondType ob = m.bondTypes.get(j);
+//                        if (m.atoms.get(h) == 1 && ob == BondType.SINGLE) hasSingleOwithH = true;
+//                    }
+//                }
+//            }
+//            if (hasDoubleO && hasSingleOwithH) return true;
+//        }
+//        return false;
+//    }
+//
+//    public static boolean isCarboxylicAcid(MoleculeWithMatrix m) {
+//        int n = m.atoms.size();
+//        for (int c = 0; c < n; c++) {
+//            if (m.atoms.get(c) != 6) continue;
+//            boolean hasDoubleO = false;
+//            boolean hasSingleOwithH = false;
+//            int oSingleIdx = -1;
+//            for (int o = 0; o < n; o++) {
+//                if (!m.m[c][o] || m.atoms.get(o) != 8) continue;
+//                hasDoubleO = true;
+//                for (int h = 0; h < n; h++) {
+//                    if (m.m[o][h] && m.atoms.get(h) == 1) hasSingleOwithH = true;
+//                }
+//            }
+//            if (hasDoubleO && hasSingleOwithH) return true;
+//        }
+//        return false;
+//    }
+//
+//    public static boolean isCarboxylicAcid(MoleculeWithVertices m) {
+//        for (int c = 0; c < m.vertices.size(); c++) {
+//            if (m.vertices.get(c) != 6) continue;
+//            boolean hasDoubleO = false;
+//            boolean hasSingleOwithH = false;
+//            int oSingleIdx = -1;
+//            for (int i = 0; i < m.bonds.size(); i += 2) {
+//                int a = m.bonds.get(i);
+//                int b = m.bonds.get(i + 1);
+//                BondType bond = m.bondTypes.get(i / 2);
+//                if (a == c && m.vertices.get(b) == 8) {
+//                    if (bond == BondType.DOUBLE) hasDoubleO = true;
+//                    if (bond == BondType.SINGLE) oSingleIdx = b;
+//                }
+//                if (b == c && m.vertices.get(a) == 8) {
+//                    if (bond == BondType.DOUBLE) hasDoubleO = true;
+//                    if (bond == BondType.SINGLE) oSingleIdx = a;
+//                }
+//            }
+//            if (oSingleIdx != -1) {
+//                for (int i = 0; i < m.bonds.size(); i += 2) {
+//                    int a = m.bonds.get(i);
+//                    int b = m.bonds.get(i + 1);
+//                    BondType bond = m.bondTypes.get(i / 2);
+//                    if (bond != BondType.SINGLE) continue;
+//                    if ((a == oSingleIdx && m.vertices.get(b) == 1) || (b == oSingleIdx && m.vertices.get(a) == 1)) {
+//                        hasSingleOwithH = true;
+//                    }
+//                }
+//            }
+//            if (hasDoubleO && hasSingleOwithH) return true;
+//        }
+//        return false;
+//    }
+//
+//    public boolean isCarboxylicAcid(Molecule m) {
+//        ArrayList<Integer> C = m.getIndexes(6);
+//        ArrayList<Integer> O = m.getIndexes(8);
+//        ArrayList<Integer> H = m.getIndexes(1);
+//        boolean[] isO = new boolean[50];
+//        boolean[] isH = new boolean[50];
+//        for (int o : O) isO[o] = true;
+//        for (int h : H) isH[h] = true;
+//        for (int c : C) {
+//            int oSingleIdx = -1;
+//            boolean hasDoubleO = false;
+//            boolean hasSingleOwithH = false;
+//            for (int o = 0; o < 50; o++) {
+//                if (!isO[o] || !m.isConnected(c, o)) continue;
+//                oSingleIdx = o;
+//                hasDoubleO = true;
+//            }
+//            if (oSingleIdx != -1) {
+//                for (int h = 0; h < 50; h++) {
+//                    if (isH[h] && m.isConnected(oSingleIdx, h)) hasSingleOwithH = true;
+//                }
+//            }
+//            if (hasDoubleO && hasSingleOwithH) return true;
+//        }
+//        return false;
+//    }
+
 }

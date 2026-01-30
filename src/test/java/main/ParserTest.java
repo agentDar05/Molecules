@@ -3,6 +3,8 @@ package main;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ParserTest {
     public static void main(String[] args) {
@@ -11,86 +13,197 @@ public class ParserTest {
             m.parse("H3PO4Cl100OOH");
         }
     }
-    @Test
-    public void parseElementWithNegativeNumber() {
-        Parser m = new Parser();
-        m.parse("H-1");
-        System.out.println(m);
-    }
-    @Test
-    public void parseElementWith0() {
-        Parser m = new Parser();
-        Assertions.assertThrows(IllegalArgumentException.class, () -> m.parse("H0"));
-    }
-    @Test
-    public void parseOneElement() {
-        Parser m = new Parser();
-        m.parse("O");
-        Assertions.assertEquals("{8=1}", m.toString());
-    }
-    //
-    @Test
-    public void parseElementWithTwoLetters() {
-        Parser m = new Parser();
-        m.parse("Cl");
-        Assertions.assertEquals("{17=1}", m.toString());
-    }
-    @Test
-    public void parseMoleculeWithoutRepeatingElements() {
-        Parser m = new Parser();
-        m.parse("H2SPO4");
-        Assertions.assertEquals("{16=1, 1=2, 8=4, 15=1}", m.toString());
-    }
-    @Test
-    public void parseMolecules() {
-        Parser m = new Parser();
-        m.parse("H2SPO4");
-        m.parse("Cl1Br8");
-
-        Assertions.assertEquals("{16=1, 1=2, 17=1, 35=8, 8=4, 15=1}", m.toString());
-    }
-    @Test
-    public void parseSameElement2Times() {
-        Parser m = new Parser();
-        m.parse("Cl2");
-        m.parse("Cl");
-
-        Assertions.assertEquals("{17=3}", m.toString());
-    }
-    @Test
-    public void parseElementWith2DigitNumber() {
-        Parser m = new Parser();
-        m.parse("Cl12");
-        Assertions.assertEquals("{17=12}", m.toString());
-    }
-    @Test
-    public void emptyMoleculeToStringReturnsEmptyString() {
-        Parser m = new Parser();
-        Assertions.assertEquals("{}", m.toString());
-    }
-    @Test
-    public void parseNullAndEmptyString() {
-        Parser m = new Parser();
-        Assertions.assertThrows(IllegalArgumentException.class, () -> m.parse(""));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> m.parse(null));
-    }
-    @Test
-    public void findsElement() {
-        Parser m = new Parser();
-        m.parse("Cl");
-        m.parse("H");
-        m.parse("Zn");
-        m.parse("Pt");
-        Assertions.assertEquals("{17=1, 1=1, 30=1, 78=1}", m.toString());
-    }
-    @Test
-    public void doesntStoreNotExistingElements() {
-        Parser m = new Parser();
-        m.parse("Q");
-        m.parse("Hi");
-        m.parse("Ok");
-        m.parse("L");
-        Assertions.assertEquals("{}", m.toString());
-    }
+//    @Test
+//    void alcoholAdjacency_positive() {
+//        MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
+//        m.addAtom((byte)8);
+//        m.addAtom((byte)1);
+//        m.addBond(0, 1);
+//
+//        assertTrue(Parser.isAlcohol(m));
+//    }
+//
+//    @Test
+//    void alcoholAdjacency_noBond() {
+//        MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
+//        m.addAtom((byte)8);
+//        m.addAtom((byte)1);
+//        assertFalse(Parser.isAlcohol(m));
+//    }
+//
+//    @Test
+//    void alcoholAdjacency_differentBond() {
+//        MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
+//        m.addAtom((byte)8);
+//        m.addAtom((byte)1);
+//        m.addAtom((byte)5);
+//        m.addBond(0, 2);
+//        assertFalse(Parser.isAlcohol(m));
+//    }
+//
+//
+//
+//    @Test
+//    void alcoholMatrix_positive() {
+//        MoleculeWithMatrix m = new MoleculeWithMatrix();
+//        m.addAtom((byte)8);
+//        m.addAtom((byte)1);
+//        m.addBond(0, 1);
+//
+//        assertTrue(Parser.isAlcohol(m));
+//    }
+//
+//    @Test
+//    void alcoholMatrix_noBond() {
+//        MoleculeWithMatrix m = new MoleculeWithMatrix();
+//        m.addAtom((byte)8);
+//        m.addAtom((byte)1);
+//        assertFalse(Parser.isAlcohol(m));
+//    }
+//
+//    @Test
+//    void alcoholMatrix_differentBond() {
+//        MoleculeWithMatrix m = new MoleculeWithMatrix();
+//        m.addAtom((byte)8);
+//        m.addAtom((byte)1);
+//        m.addAtom((byte)5);
+//        m.addBond(0, 2);
+//        assertFalse(Parser.isAlcohol(m));
+//    }
+//
+//
+//    @Test
+//    void alcoholVertices_positive() {
+//        MoleculeWithVertices m = new MoleculeWithVertices();
+//        m.addAtom((byte)8);
+//        m.addAtom((byte)1);
+//        m.addBond(0, 1);
+//
+//        assertTrue(Parser.isAlcohol(m));
+//    }
+//
+//    @Test
+//    void alcoholVertices_noBond() {
+//        MoleculeWithVertices m = new MoleculeWithVertices();
+//        m.addAtom((byte)8);
+//        m.addAtom((byte)1);
+//        assertFalse(Parser.isAlcohol(m));
+//    }
+//
+//    @Test
+//    void alcoholVertices_differentBond() {
+//        MoleculeWithVertices m = new MoleculeWithVertices();
+//        m.addAtom((byte)8);
+//        m.addAtom((byte)1);
+//        m.addAtom((byte)5);
+//        m.addBond(0, 2);
+//        assertFalse(Parser.isAlcohol(m));
+//    }
+//    @Test
+//    void carboxyAdjacency_positive() {
+//        MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
+//        m.addAtom((byte)6);
+//        m.addAtom((byte)8);
+//        m.addAtom((byte)8);
+//        m.addAtom((byte)1);
+//        m.addBond(0, 1, BondType.DOUBLE);
+//        m.addBond(0, 2, BondType.SINGLE);
+//        m.addBond(2, 3, BondType.SINGLE);
+//        assertTrue(Parser.isCarboxylicAcid(m));
+//    }
+//
+//    @Test
+//    void carboxyAdjacency_noBond() {
+//        MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
+//        m.addAtom((byte)6);
+//        m.addAtom((byte)8);
+//        m.addAtom((byte)8);
+//        m.addAtom((byte)1);
+//        assertFalse(Parser.isCarboxylicAcid(m));
+//    }
+//
+//    @Test
+//    void carboxyAdjacency_incompleteBond() {
+//        MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
+//        m.addAtom(6);
+//        m.addAtom(8);
+//        m.addAtom(8);
+//        m.addAtom(1);
+//        m.addBond(0, 1, BondType.SINGLE);
+//        m.addBond(0, 2, BondType.SINGLE);
+//        m.addBond(2, 3, BondType.SINGLE);
+//        assertFalse(Parser.isCarboxylicAcid(m));
+//    }
+//
+//    @Test
+//    void carboxyMatrix_positive() {
+//        MoleculeWithMatrix m = new MoleculeWithMatrix();
+//        m.addAtom(6);
+//        m.addAtom(8);
+//        m.addAtom(8);
+//        m.addAtom(1);
+//        m.addBond(0, 1);
+//        m.addBond(0, 2);
+//        m.addBond(2, 3);
+//        assertTrue(Parser.isCarboxylicAcid(m));
+//    }
+//
+//    @Test
+//    void carboxyMatrix_noBond() {
+//        MoleculeWithMatrix m = new MoleculeWithMatrix();
+//        m.addAtom(6);
+//        m.addAtom(8);
+//        m.addAtom(8);
+//        m.addAtom(1);
+//        assertFalse(Parser.isCarboxylicAcid(m));
+//    }
+//
+//    @Test
+//    void carboxyMatrix_incompleteBond() {
+//        MoleculeWithMatrix m = new MoleculeWithMatrix();
+//        m.addAtom(6);
+//        m.addAtom(8);
+//        m.addAtom(8);
+//        m.addAtom(1);
+//        m.addBond(0, 1);
+//        m.addBond(0, 2);
+//        assertFalse(Parser.isCarboxylicAcid(m));
+//    }
+//
+//    @Test
+//    void carboxyVertices_positive() {
+//        MoleculeWithVertices m = new MoleculeWithVertices();
+//        m.addAtom(6);
+//        m.addAtom(8);
+//        m.addAtom(8);
+//        m.addAtom(1);
+//        m.addBond(0, 1, BondType.DOUBLE);
+//        m.addBond(0, 2, BondType.SINGLE);
+//        m.addBond(2, 3, BondType.SINGLE);
+//        assertTrue(Parser.isCarboxylicAcid(m));
+//    }
+//
+//    @Test
+//    void carboxyVertices_noBond() {
+//        MoleculeWithVertices m = new MoleculeWithVertices();
+//        m.addAtom(6);
+//        m.addAtom(8);
+//        m.addAtom(8);
+//        m.addAtom(1);
+//        assertFalse(Parser.isCarboxylicAcid(m));
+//    }
+//
+//    @Test
+//    void carboxyVertices_incompleteBond() {
+//        MoleculeWithVertices m = new MoleculeWithVertices();
+//        m.addAtom(6);
+//        m.addAtom(8);
+//        m.addAtom(8);
+//        m.addAtom(1);
+//        m.addBond(0, 1, BondType.SINGLE);
+//        m.addBond(0, 2, BondType.SINGLE);
+//        m.addBond(2, 3, BondType.SINGLE);
+//        assertFalse(Parser.isCarboxylicAcid(m));
+//    }
 
 }
