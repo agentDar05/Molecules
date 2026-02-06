@@ -47,53 +47,90 @@ public class MoleculeWithAdjacencyList implements Molecule {
         return types[i][j];
     }
 
+    // check if molecule pattern is a subgraph of molecule target (Ullman algorithm)
     public static boolean isSubgraph(
-            MoleculeWithAdjacencyList h,
-            MoleculeWithAdjacencyList g
+            MoleculeWithAdjacencyList pattern,
+            MoleculeWithAdjacencyList target
     ) {
-        int[] map = new int[h.size()];
-        boolean[] used = new boolean[g.size()];
-        Arrays.fill(map, -1);
+        // patternIndex -> targetIndex mapping
+        int[] mapping = new int[pattern.size()];
+        // marks which target vertices are already used
+        boolean[] targetUsed = new boolean[target.size()];
 
-        for (int start = 0; start < g.size(); start++) {
-            if (g.getAtom(start) != h.getAtom(0)) continue;
-            Arrays.fill(map, -1);
-            Arrays.fill(used, false);
-            if (dfsAdj(0, start, h, g, map, used)) return true;
+        Arrays.fill(mapping, -1);
+
+        // try to match pattern[0] with every compatible target vertex
+        for (int targetStart = 0; targetStart < target.size(); targetStart++) {
+            if (target.getAtom(targetStart) != pattern.getAtom(0)) continue;
+
+            Arrays.fill(mapping, -1);
+            Arrays.fill(targetUsed, false);
+
+            if (dfsMatch(0, targetStart, pattern, target, mapping, targetUsed)) {
+                return true;
+            }
         }
         return false;
     }
 
-    private static boolean dfsAdj(
-            int uh, int ug,
-            MoleculeWithAdjacencyList h,
-            MoleculeWithAdjacencyList g,
-            int[] map,
-            boolean[] used
+    private static boolean dfsMatch(
+            int patternVertex,
+            int targetVertex,
+            MoleculeWithAdjacencyList pattern,
+            MoleculeWithAdjacencyList target,
+            int[] mapping,
+            boolean[] targetUsed
     ) {
-        map[uh] = ug;
-        used[ug] = true;
+        // assign mapping
+        mapping[patternVertex] = targetVertex;
+        targetUsed[targetVertex] = true;
 
-        for (int vh : h.bonds.get(uh)) {
-            int mapped = map[vh];
-            if (mapped != -1) {
-                if (!g.isConnected(ug, mapped)) return false;
-                if (h.getBondType(uh, vh) != g.getBondType(ug, mapped)) return false;
-            } else {
-                boolean ok = false;
-                for (int vg : g.bonds.get(ug)) {
-                    if (used[vg]) continue;
-                    if (g.getAtom(vg) != h.getAtom(vh)) continue;
-                    if (h.getBondType(uh, vh) != g.getBondType(ug, vg)) continue;
-                    if (dfsAdj(vh, vg, h, g, map, used)) {
-                        ok = true;
+        // check all neighbors of patternVertex
+        for (int patternNeighbor : pattern.bonds.get(patternVertex)) {
+
+            int mappedNeighbor = mapping[patternNeighbor];
+
+            // neighbor already matched - check the edge exists and matches
+
+            if (mappedNeighbor != -1) {
+                // must exist edge in target
+                if (!target.isConnected(targetVertex, mappedNeighbor))
+                    return false;
+
+                // bond types must match
+                if (pattern.getBondType(patternVertex, patternNeighbor)
+                        != target.getBondType(targetVertex, mappedNeighbor))
+                    return false;
+            }
+            // neighbor not mapped - try candidates
+            else {
+                boolean matched = false;
+
+                for (int candidate : target.bonds.get(targetVertex)) {
+                    if (targetUsed[candidate]) continue;
+
+                    // atom labels check
+                    if (target.getAtom(candidate) != pattern.getAtom(patternNeighbor))
+                        continue;
+
+                    // bond type check
+                    if (pattern.getBondType(patternVertex, patternNeighbor)
+                            != target.getBondType(targetVertex, candidate))
+                        continue;
+
+                    // recursion
+                    if (dfsMatch(patternNeighbor, candidate,
+                            pattern, target, mapping, targetUsed)) {
+                        matched = true;
                         break;
                     }
                 }
-                if (!ok) return false;
+
+                if (!matched) return false;
             }
         }
         return true;
     }
+
 
 }

@@ -260,65 +260,66 @@ public class Parser {
         throw new IllegalArgumentException("Unmatched '(' at position " + open);
     }
 
-    public static void isAlcoholAdjacency(MoleculeWithAdjacencyList m){
+    public static boolean isAlcoholAdjacency(MoleculeWithAdjacencyList m){
         MoleculeWithAdjacencyList oh = new MoleculeWithAdjacencyList();
         oh.addAtom(H); // 0
         oh.addAtom(O); // 1
         oh.addAtom(C); // 2
         oh.addBond(1, 0);
         oh.addBond(2, 1);
-        MoleculeWithAdjacencyList.isSubgraph(oh, m);
+        return MoleculeWithAdjacencyList.isSubgraph(oh, m);
+
     }
-    public static void isAlcoholMatrix(MoleculeWithMatrix m){
+    public static boolean isAlcoholMatrix(MoleculeWithMatrix m){
         MoleculeWithMatrix oh = new MoleculeWithMatrix();
         oh.addAtom(H); // 0
         oh.addAtom(O); // 1
         oh.addAtom(C); // 2
         oh.addBond(1, 0);
         oh.addBond(2, 1);
-        MoleculeWithMatrix.isSubgraph(oh, m);
+        return MoleculeWithMatrix.isSubgraph(oh, m);
     }
-    public static void isAlcoholVertices(MoleculeWithVertices m){
+    public static boolean isAlcoholVertices(MoleculeWithVertices m){
         MoleculeWithVertices oh = new MoleculeWithVertices();
         oh.addAtom(H); // 0
         oh.addAtom(O); // 1
         oh.addAtom(C); // 2
         oh.addBond(1, 0);
         oh.addBond(2, 1);
-        MoleculeWithVertices.isSubgraph(oh, m);
+        return MoleculeWithVertices.isSubgraph(oh, m);
     }
-    public static void isCarboxylicAcidAdjacency(MoleculeWithAdjacencyList m){
+    public static boolean isCarboxylicAcidAdjacency(MoleculeWithAdjacencyList m){
         MoleculeWithAdjacencyList cooh = new MoleculeWithAdjacencyList();
         cooh.addAtom(H); // 0
         cooh.addAtom(O); // 1
         cooh.addAtom(O); // 2
         cooh.addAtom(C); // 3
-        cooh.addBond(3, 1);
-        cooh.addBond(3, 2);
-        cooh.addBond(2, 0);
-        MoleculeWithAdjacencyList.isSubgraph(cooh, m);
+        cooh.addBond(3, 1, BondType.DOUBLE);
+        cooh.addBond(3, 2, BondType.SINGLE);
+        cooh.addBond(2, 0, BondType.SINGLE);
+        return MoleculeWithAdjacencyList.isSubgraph(cooh, m);
     }
-    public static void isCarboxylicAcidMatrix(MoleculeWithMatrix m){
+    public static boolean isCarboxylicAcidMatrix(MoleculeWithMatrix m){
         MoleculeWithMatrix cooh = new MoleculeWithMatrix();
         cooh.addAtom(H); // 0
         cooh.addAtom(O); // 1
         cooh.addAtom(O); // 2
         cooh.addAtom(C); // 3
-        cooh.addBond(3, 1);
-        cooh.addBond(3, 2);
-        cooh.addBond(2, 0);
-        MoleculeWithMatrix.isSubgraph(cooh, m);
+        cooh.addBond(3, 1, BondType.DOUBLE);
+        cooh.addBond(3, 2, BondType.SINGLE);
+        cooh.addBond(2, 0, BondType.SINGLE);
+       return  MoleculeWithMatrix.isSubgraph(cooh, m);
     }
-    public static void isCarboxylicAcidVertices(MoleculeWithVertices m){
+    public static boolean isCarboxylicAcidVertices(MoleculeWithVertices m){
         MoleculeWithVertices cooh = new MoleculeWithVertices();
         cooh.addAtom(H); // 0
         cooh.addAtom(O); // 1
         cooh.addAtom(O); // 2
         cooh.addAtom(C); // 3
-        cooh.addBond(3, 1);
-        cooh.addBond(3, 2);
-        cooh.addBond(2, 0);
-        MoleculeWithVertices.isSubgraph(cooh, m);
+        cooh.addBond(3, 1, BondType.DOUBLE);
+        cooh.addBond(3, 2, BondType.SINGLE);
+        cooh.addBond(2, 0, BondType.SINGLE);
+        return MoleculeWithVertices.isSubgraph(cooh, m);
     }
 //    public static boolean isAlcohol(Molecule m) {
 //        for (int o : m.getIndexes((byte)8)) {
