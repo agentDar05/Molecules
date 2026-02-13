@@ -8,27 +8,12 @@ public class MoleculeWithVertices implements Molecule {
     Ints bonds = new Ints();
     Bytes types = new Bytes();
 
-    public void addAtom(byte a) {
-        vertices.add(a);
-    }
+    public void addAtom(byte a) { vertices.add(a); }
+    public void addBond(int i, int j) { addBond(i, j, BondType.SINGLE); }
+    public void addBond(int i, int j, byte t) { bonds.add(i); bonds.add(j); types.add(t); }
 
-    public void addBond(int i, int j) {
-        addBond(i, j, BondType.SINGLE);
-    }
-
-    public void addBond(int i, int j, byte t) {
-        bonds.add(i);
-        bonds.add(j);
-        types.add(t);
-    }
-
-    public int size() {
-        return vertices.size();
-    }
-
-    public byte getAtom(int i) {
-        return vertices.get(i);
-    }
+    public int size() { return vertices.size(); }
+    public byte getAtom(int i) { return vertices.get(i); }
 
     public ArrayList<Integer> getIndexes(byte e) {
         ArrayList<Integer> r = new ArrayList<>();
@@ -52,44 +37,45 @@ public class MoleculeWithVertices implements Molecule {
                 return types.get(i / 2);
         return 0;
     }
-    public static boolean isSubgraph(
-            MoleculeWithAdjacencyList h,
-            MoleculeWithAdjacencyList g
-    ) {
-        int[] map = new int[h.size()];
-        boolean[] used = new boolean[g.size()];
-        Arrays.fill(map, -1);
 
-        for (int start = 0; start < g.size(); start++) {
-            if (g.getAtom(start) != h.getAtom(0)) continue;
-            Arrays.fill(map, -1);
+    public static boolean isSubgraph(MoleculeWithVertices pattern, MoleculeWithVertices target) {
+        int[] mapping = new int[pattern.size()];
+        boolean[] used = new boolean[target.size()];
+        Arrays.fill(mapping, -1);
+
+        for (int t = 0; t < target.size(); t++) {
+            if (target.getAtom(t) != pattern.getAtom(0)) continue;
+            Arrays.fill(mapping, -1);
             Arrays.fill(used, false);
-            if (dfs(0, start, h, g, map, used)) return true;
+            if (dfs(pattern, target, mapping, used, 0, t)) return true;
         }
         return false;
     }
-    private static boolean dfs(
-            int uh, int ug,
-            MoleculeWithAdjacencyList h,
-            MoleculeWithAdjacencyList g,
-            int[] map,
-            boolean[] used
-    ) {
-        map[uh] = ug;
-        used[ug] = true;
 
-        for (int vh : h.bonds.get(uh)) {
-            int mapped = map[vh];
+    private static boolean dfs(MoleculeWithVertices p, MoleculeWithVertices t,
+                               int[] mapping, boolean[] used, int uP, int uT) {
+        mapping[uP] = uT;
+        used[uT] = true;
+
+        for (int i = 0; i < p.bonds.size(); i += 2) {
+            int a = p.bonds.get(i), b = p.bonds.get(i+1);
+            if (a != uP && b != uP) continue;
+            int vP = (a == uP) ? b : a;
+            byte tBond = p.types.get(i/2);
+
+            int mapped = mapping[vP];
             if (mapped != -1) {
-                if (!g.isConnected(ug, mapped)) return false;
-                if (h.getBondType(uh, vh) != g.getBondType(ug, mapped)) return false;
+                if (!t.isConnected(uT, mapped) || t.getBondType(uT, mapped) != tBond)
+                    return false;
             } else {
                 boolean ok = false;
-                for (int vg : g.bonds.get(ug)) {
-                    if (used[vg]) continue;
-                    if (g.getAtom(vg) != h.getAtom(vh)) continue;
-                    if (h.getBondType(uh, vh) != g.getBondType(ug, vg)) continue;
-                    if (dfs(vh, vg, h, g, map, used)) {
+                for (int j = 0; j < t.bonds.size(); j += 2) {
+                    int x = t.bonds.get(j), y = t.bonds.get(j+1);
+                    int vT = (x == uT) ? y : (y == uT ? x : -1);
+                    if (vT == -1 || used[vT]) continue;
+                    if (t.getAtom(vT) != p.getAtom(vP)) continue;
+                    if (t.types.get(j/2) != tBond) continue;
+                    if (dfs(p, t, mapping, used, vP, vT)) {
                         ok = true;
                         break;
                     }
@@ -99,64 +85,4 @@ public class MoleculeWithVertices implements Molecule {
         }
         return true;
     }
-    public static boolean isSubgraph(
-            MoleculeWithVertices h,
-            MoleculeWithVertices g
-    ) {
-        int[] map = new int[h.size()];
-        boolean[] used = new boolean[g.size()];
-        Arrays.fill(map, -1);
-
-        for (int start = 0; start < g.size(); start++) {
-            if (g.getAtom(start) != h.getAtom(0)) continue;
-            Arrays.fill(map, -1);
-            Arrays.fill(used, false);
-            if (dfs(0, start, h, g, map, used)) return true;
-        }
-        return false;
-    }
-
-    private static boolean dfs(
-            int uh, int ug,
-            MoleculeWithVertices h,
-            MoleculeWithVertices g,
-            int[] map,
-            boolean[] used
-    ) {
-        map[uh] = ug;
-        used[ug] = true;
-
-        for (int i = 0; i < h.bonds.size(); i += 2) {
-            int a = h.bonds.get(i);
-            int b = h.bonds.get(i + 1);
-            if (a != uh && b != uh) continue;
-
-            int vh = (a == uh) ? b : a;
-            byte t = h.types.get(i / 2);
-
-            int mapped = map[vh];
-            if (mapped != -1) {
-                if (!g.isConnected(ug, mapped)) return false;
-                if (g.getBondType(ug, mapped) != t) return false;
-            } else {
-                boolean ok = false;
-                for (int j = 0; j < g.bonds.size(); j += 2) {
-                    int x = g.bonds.get(j);
-                    int y = g.bonds.get(j + 1);
-                    int vg = (x == ug) ? y : (y == ug ? x : -1);
-                    if (vg == -1) continue;
-                    if (used[vg]) continue;
-                    if (g.getAtom(vg) != h.getAtom(vh)) continue;
-                    if (g.types.get(j / 2) != t) continue;
-                    if (dfs(vh, vg, h, g, map, used)) {
-                        ok = true;
-                        break;
-                    }
-                }
-                if (!ok) return false;
-            }
-        }
-        return true;
-    }
-
 }
