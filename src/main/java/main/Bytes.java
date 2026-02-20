@@ -6,7 +6,8 @@ public class Bytes {
 
     public void add(byte x) {
         if (size == data.length) {
-            byte[] n = new byte[data.length * 2];
+            int newLength = Math.min(data.length * 2, Integer.MAX_VALUE-100);
+            byte[] n = new byte[newLength];
             System.arraycopy(data, 0, n, 0, data.length);
             data = n;
         }

@@ -1,18 +1,14 @@
 package main;
 
-import org.junit.jupiter.api.Assertions;
+import main.Ullman.MoleculeWithAdjacencyList;
+import main.Ullman.MoleculeWithMatrix;
+import main.Ullman.MoleculeWithVertices;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ParserTest {
-//    public static void main(String[] args) {
-//        Parser m = new Parser();
-//        for (int i = 0; i < 10_000_000; i++) {
-//            m.parse("H3PO4Cl100OOH");
-//        }
-//    }
     @Test
     void alcoholAdjacency_positive() {
         MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();

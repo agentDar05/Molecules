@@ -1,5 +1,9 @@
 package main;
 
+import main.Ullman.MoleculeWithAdjacencyList;
+import main.Ullman.MoleculeWithMatrix;
+import main.Ullman.MoleculeWithVertices;
+
 import java.util.*;
 
 public class Parser {
