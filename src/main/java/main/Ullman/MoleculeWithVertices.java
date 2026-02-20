@@ -17,8 +17,7 @@ public class MoleculeWithVertices implements Molecule {
     public void addBond(int i, int j) { addBond(i, j, BondType.SINGLE); }
     public void addBond(int i, int j, byte t) { bonds.add(i); bonds.add(j); types.add(t); }
 
-    public int size() { return vertices
-            .size(); }
+    public int size() { return vertices.size(); }
     public byte getAtom(int i) { return vertices.get(i); }
 
     public ArrayList<Integer> getIndexes(byte e) {
