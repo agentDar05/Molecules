@@ -32,59 +32,99 @@ public class MoleculeWithMatrix implements Molecule {
     public boolean isConnected(int i, int j) { return m[i][j]; }
     public byte getBondType(int i, int j) { return types[i][j]; }
 
-    public static boolean isSubgraph(MoleculeWithMatrix p,
-                                        MoleculeWithMatrix t) {
-        int pSize = p.size(), tSize = t.size();
-        int[] mapping = new int[pSize];
-        int[] reverse = new int[tSize];
-        int[] next = new int[pSize];
+    // mapping[i] = target vertex matched to pattern vertex i
+    // reverse[j] = pattern vertex matched to target vertex j
+    public static boolean isSubgraph(MoleculeWithMatrix pattern, MoleculeWithMatrix target) {
+
+        int patternSize = pattern.size();
+        int targetSize = target.size();
+
+        int[] mapping = new int[patternSize];
+        int[] reverse = new int[targetSize];
+        int[] nextCandidate = new int[patternSize];
+
         Arrays.fill(mapping, -1);
         Arrays.fill(reverse, -1);
-        Arrays.fill(next, 0);
-        int depth = 0;
-        while (depth >= 0) {
-            if (depth == pSize) return true;
-            boolean found = false;
-            for (int cand = next[depth]; cand < tSize; cand++) {
-                next[depth] = cand + 1;
-                if (reverse[cand] != -1) continue;
-                if (p.getAtom(depth) != t.getAtom(cand)) continue;
-                if (!feasibleMatrix(p, t, mapping, depth, cand)) continue;
-                mapping[depth] = cand;
-                reverse[cand] = depth;
-                depth++;
-                if (depth < pSize) next[depth] = 0;
+        Arrays.fill(nextCandidate, 0);
 
-                found = true;
+        int depth = 0;
+
+        while (depth >= 0) {
+
+            if (depth == patternSize)
+                return true;
+
+            boolean matchFound = false;
+
+            for (int candidate = nextCandidate[depth];
+                 candidate < targetSize;
+                 candidate++) {
+
+                nextCandidate[depth] = candidate + 1;
+
+                if (reverse[candidate] != -1)
+                    continue;
+
+                if (pattern.getAtom(depth) != target.getAtom(candidate))
+                    continue;
+
+                if (!isFeasible(pattern, target,
+                        mapping, depth, candidate))
+                    continue;
+
+                mapping[depth] = candidate;
+                reverse[candidate] = depth;
+
+                depth++;
+                if (depth < patternSize)
+                    nextCandidate[depth] = 0;
+
+                matchFound = true;
                 break;
             }
-            if (!found) {
+
+            if (!matchFound) {
                 depth--;
                 if (depth >= 0) {
-                    reverse[mapping[depth]] = -1;
+                    int mappedVertex = mapping[depth];
+                    reverse[mappedVertex] = -1;
                     mapping[depth] = -1;
                 }
             }
         }
+
         return false;
     }
-    private static boolean feasibleMatrix(MoleculeWithMatrix p,
-                                          MoleculeWithMatrix t,
-                                          int[] mapping,
-                                          int uP, int uT) {
 
-        for (int vP = 0; vP < p.size(); vP++) {
-            if (mapping[vP] == -1) continue;
+    private static boolean isFeasible(MoleculeWithMatrix pattern, MoleculeWithMatrix target, int[] mapping, int patternVertex, int targetVertex) {
 
-            boolean eP = p.isConnected(uP, vP);
-            boolean eT = t.isConnected(uT, mapping[vP]);
+        for (int otherPatternVertex = 0;
+             otherPatternVertex < pattern.size();
+             otherPatternVertex++) {
 
-            if (eP != eT) return false;
-            if (eP &&
-                    p.getBondType(uP, vP) !=
-                            t.getBondType(uT, mapping[vP]))
+            if (mapping[otherPatternVertex] == -1)
+                continue;
+
+            boolean edgeInPattern =
+                    pattern.isConnected(patternVertex,
+                            otherPatternVertex);
+
+            boolean edgeInTarget =
+                    target.isConnected(targetVertex,
+                            mapping[otherPatternVertex]);
+
+            if (edgeInPattern != edgeInTarget)
                 return false;
+
+            if (edgeInPattern) {
+                if (pattern.getBondType(patternVertex,
+                        otherPatternVertex) !=
+                        target.getBondType(targetVertex,
+                                mapping[otherPatternVertex]))
+                    return false;
+            }
         }
+
         return true;
     }
 }

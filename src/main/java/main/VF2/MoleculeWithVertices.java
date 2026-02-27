@@ -43,8 +43,8 @@ public class MoleculeWithVertices implements Molecule {
                 return types.get(i / 2);
         return 0;
     }
-    public static boolean isSubgraph(MoleculeWithVertices p,
-                                        MoleculeWithVertices t) {
+    public static boolean isSubgraph(main.VF2.MoleculeWithVertices p,
+                                     main.VF2.MoleculeWithVertices t) {
 
         int pSize = p.size(), tSize = t.size();
         int[] mapping = new int[pSize];
@@ -89,8 +89,8 @@ public class MoleculeWithVertices implements Molecule {
         }
         return false;
     }
-    private static boolean feasibleVertices(MoleculeWithVertices p,
-                                            MoleculeWithVertices t,
+    private static boolean feasibleVertices(main.VF2.MoleculeWithVertices p,
+                                            main.VF2.MoleculeWithVertices t,
                                             int[] mapping,
                                             int uP, int uT) {
 
