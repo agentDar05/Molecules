@@ -9,122 +9,94 @@ import java.util.Arrays;
 
 public class MoleculeWithMatrix implements Molecule {
     Bytes atoms = new Bytes();
-    boolean[][] m = new boolean[50][50];
-    byte[][] types = new byte[50][50];
+    boolean[][] bonds = new boolean[50][50];
+    byte[][] bondTypes = new byte[50][50];
 
-    public void addAtom(byte a) { atoms.add(a); }
-    public void addBond(int i, int j) { addBond(i, j, BondType.SINGLE); }
-    public void addBond(int i, int j, byte t) {
-        m[i][j] = m[j][i] = true;
-        types[i][j] = types[j][i] = t;
+    public void addAtom(byte atom) {
+        atoms.add(atom);
     }
 
-    public int size() { return atoms.size(); }
-    public byte getAtom(int i) { return atoms.get(i); }
+    public void addBond(int i, int j) {
+        addBond(i, j, BondType.SINGLE);
+    }
 
-    public ArrayList<Integer> getIndexes(byte e) {
-        ArrayList<Integer> r = new ArrayList<>();
+    public void addBond(int i, int j, byte type) {
+        bonds[i][j] = bonds[j][i] = true;
+        bondTypes[i][j] = bondTypes[j][i] = type;
+    }
+
+    public int size() {
+        return atoms.size();
+    }
+
+    public byte getAtom(int i) {
+        return atoms.get(i);
+    }
+
+    public ArrayList<Integer> getIndexes(byte atom) {
+        ArrayList<Integer> result = new ArrayList<>();
         for (int i = 0; i < atoms.size(); i++)
-            if (atoms.get(i) == e) r.add(i);
-        return r;
+            if (atoms.get(i) == atom) result.add(i);
+        return result;
     }
 
-    public boolean isConnected(int i, int j) { return m[i][j]; }
-    public byte getBondType(int i, int j) { return types[i][j]; }
+    public boolean isConnected(int i, int j) {
+        return bonds[i][j];
+    }
 
-    // mapping[i] = target vertex matched to pattern vertex i
-    // reverse[j] = pattern vertex matched to target vertex j
-    public static boolean isSubgraph(MoleculeWithMatrix pattern, MoleculeWithMatrix target) {
+    public byte getBondType(int i, int j) {
+        return bondTypes[i][j];
+    }
 
-        int patternSize = pattern.size();
+    public static boolean isSubgraph(MoleculeWithMatrix query, MoleculeWithMatrix target) {
+        int querySize = query.size();
         int targetSize = target.size();
-
-        int[] mapping = new int[patternSize];
-        int[] reverse = new int[targetSize];
-        int[] nextCandidate = new int[patternSize];
-
-        Arrays.fill(mapping, -1);
-        Arrays.fill(reverse, -1);
+        int[] queryToTarget = new int[querySize];
+        int[] targetToQuery = new int[targetSize];
+        int[] nextCandidate = new int[querySize];
+        Arrays.fill(queryToTarget, -1);
+        Arrays.fill(targetToQuery, -1);
         Arrays.fill(nextCandidate, 0);
-
         int depth = 0;
 
         while (depth >= 0) {
-
-            if (depth == patternSize)
-                return true;
-
-            boolean matchFound = false;
-
-            for (int candidate = nextCandidate[depth];
-                 candidate < targetSize;
-                 candidate++) {
-
+            if (depth == querySize) return true;
+            boolean found = false;
+            for (int candidate = nextCandidate[depth]; candidate < targetSize; candidate++) {
                 nextCandidate[depth] = candidate + 1;
-
-                if (reverse[candidate] != -1)
-                    continue;
-
-                if (pattern.getAtom(depth) != target.getAtom(candidate))
-                    continue;
-
-                if (!isFeasible(pattern, target,
-                        mapping, depth, candidate))
-                    continue;
-
-                mapping[depth] = candidate;
-                reverse[candidate] = depth;
-
+                if (targetToQuery[candidate] != -1) continue;
+                if (query.getAtom(depth) != target.getAtom(candidate)) continue;
+                if (!isFeasible(query, target, queryToTarget, depth, candidate)) continue;
+                queryToTarget[depth] = candidate;
+                targetToQuery[candidate] = depth;
                 depth++;
-                if (depth < patternSize)
-                    nextCandidate[depth] = 0;
-
-                matchFound = true;
+                if (depth < querySize) nextCandidate[depth] = 0;
+                found = true;
                 break;
             }
-
-            if (!matchFound) {
+            if (!found) {
                 depth--;
                 if (depth >= 0) {
-                    int mappedVertex = mapping[depth];
-                    reverse[mappedVertex] = -1;
-                    mapping[depth] = -1;
+                    int mapped = queryToTarget[depth];
+                    targetToQuery[mapped] = -1;
+                    queryToTarget[depth] = -1;
                 }
             }
         }
-
         return false;
     }
 
-    private static boolean isFeasible(MoleculeWithMatrix pattern, MoleculeWithMatrix target, int[] mapping, int patternVertex, int targetVertex) {
-
-        for (int otherPatternVertex = 0;
-             otherPatternVertex < pattern.size();
-             otherPatternVertex++) {
-
-            if (mapping[otherPatternVertex] == -1)
-                continue;
-
-            boolean edgeInPattern =
-                    pattern.isConnected(patternVertex,
-                            otherPatternVertex);
-
-            boolean edgeInTarget =
-                    target.isConnected(targetVertex,
-                            mapping[otherPatternVertex]);
-
-            if (edgeInPattern != edgeInTarget)
-                return false;
-
-            if (edgeInPattern) {
-                if (pattern.getBondType(patternVertex,
-                        otherPatternVertex) !=
-                        target.getBondType(targetVertex,
-                                mapping[otherPatternVertex]))
+    private static boolean isFeasible(MoleculeWithMatrix query, MoleculeWithMatrix target, int[] queryToTarget, int queryAtom, int targetAtom) {
+        for (int otherQueryAtom = 0; otherQueryAtom < query.size(); otherQueryAtom++) {
+            if (queryToTarget[otherQueryAtom] == -1) continue;
+            boolean bondInQuery = query.isConnected(queryAtom, otherQueryAtom);
+            boolean bondInTarget = target.isConnected(targetAtom, queryToTarget[otherQueryAtom]);
+            if (bondInQuery != bondInTarget) return false;
+            if (bondInQuery) {
+                if (query.getBondType(queryAtom, otherQueryAtom) != target.getBondType(targetAtom, queryToTarget[otherQueryAtom]))
                     return false;
             }
         }
-
         return true;
     }
 }

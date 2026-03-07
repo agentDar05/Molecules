@@ -4,11 +4,19 @@ import main.Ullman.MoleculeWithAdjacencyList;
 import main.Ullman.MoleculeWithMatrix;
 import main.Ullman.MoleculeWithVertices;
 import org.junit.jupiter.api.Test;
+import org.openscience.cdk.exception.InvalidSmilesException;
+import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
+import org.openscience.cdk.smiles.SmilesParser;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ParserTest {
+    public static void main(String[] args) throws InvalidSmilesException {
+        IAtomContainer ccco = new SmilesParser(SilentChemObjectBuilder.getInstance()).parseSmiles("CCCO");
+    }
     @Test
     void alcoholAdjacency_positive() {
         MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();

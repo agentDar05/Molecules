@@ -13,69 +13,71 @@ public class MoleculeWithVertices implements Molecule {
     Ints bonds = new Ints();
     Bytes types = new Bytes();
 
-    public void addAtom(byte a) { vertices.add(a); }
-    public void addBond(int i, int j) { addBond(i, j, BondType.SINGLE); }
-    public void addBond(int i, int j, byte t) { bonds.add(i); bonds.add(j); types.add(t); }
+    public void addAtom(byte atom) {
+        vertices.add(atom);
+    }
 
-    public int size() { return vertices
-            .size(); }
-    public byte getAtom(int i) { return vertices.get(i); }
+    public void addBond(int i, int j) {
+        addBond(i, j, BondType.SINGLE);
+    }
 
-    public ArrayList<Integer> getIndexes(byte e) {
-        ArrayList<Integer> r = new ArrayList<>();
+    public void addBond(int i, int j, byte type) {
+        bonds.add(i);
+        bonds.add(j);
+        types.add(type);
+    }
+
+    public int size() {
+        return vertices.size();
+    }
+
+    public byte getAtom(int i) {
+        return vertices.get(i);
+    }
+
+    public ArrayList<Integer> getIndexes(byte atom) {
+        ArrayList<Integer> result = new ArrayList<>();
         for (int i = 0; i < vertices.size(); i++)
-            if (vertices.get(i) == e) r.add(i);
-        return r;
+            if (vertices.get(i) == atom) result.add(i);
+        return result;
     }
 
     public boolean isConnected(int a, int b) {
         for (int i = 0; i < bonds.size(); i += 2)
-            if ((bonds.get(i) == a && bonds.get(i + 1) == b) ||
-                    (bonds.get(i) == b && bonds.get(i + 1) == a))
+            if ((bonds.get(i) == a && bonds.get(i + 1) == b) || (bonds.get(i) == b && bonds.get(i + 1) == a))
                 return true;
         return false;
     }
 
     public byte getBondType(int a, int b) {
         for (int i = 0; i < bonds.size(); i += 2)
-            if ((bonds.get(i) == a && bonds.get(i + 1) == b) ||
-                    (bonds.get(i) == b && bonds.get(i + 1) == a))
+            if ((bonds.get(i) == a && bonds.get(i + 1) == b) || (bonds.get(i) == b && bonds.get(i + 1) == a))
                 return types.get(i / 2);
         return 0;
     }
-    public static boolean isSubgraph(main.VF2.MoleculeWithVertices p,
-                                     main.VF2.MoleculeWithVertices t) {
 
-        int pSize = p.size(), tSize = t.size();
-        int[] mapping = new int[pSize];
-        int[] reverse = new int[tSize];
-        int[] next = new int[pSize];
-
+    public static boolean isSubgraph(MoleculeWithVertices query, MoleculeWithVertices target) {
+        int querySize = query.size(), targetSize = target.size();
+        int[] mapping = new int[querySize];
+        int[] reverse = new int[targetSize];
+        int[] nextCandidate = new int[querySize];
         Arrays.fill(mapping, -1);
         Arrays.fill(reverse, -1);
-        Arrays.fill(next, 0);
-
+        Arrays.fill(nextCandidate, 0);
         int depth = 0;
 
         while (depth >= 0) {
-
-            if (depth == pSize) return true;
-
+            if (depth == querySize) return true;
             boolean found = false;
-
-            for (int cand = next[depth]; cand < tSize; cand++) {
-                next[depth] = cand + 1;
-
-                if (reverse[cand] != -1) continue;
-                if (p.getAtom(depth) != t.getAtom(cand)) continue;
-                if (!feasibleVertices(p, t, mapping, depth, cand)) continue;
-
-                mapping[depth] = cand;
-                reverse[cand] = depth;
-
+            for (int candidate = nextCandidate[depth]; candidate < targetSize; candidate++) {
+                nextCandidate[depth] = candidate + 1;
+                if (reverse[candidate] != -1) continue;
+                if (query.getAtom(depth) != target.getAtom(candidate)) continue;
+                if (!feasibleVertices(query, target, mapping, depth, candidate)) continue;
+                mapping[depth] = candidate;
+                reverse[candidate] = depth;
                 depth++;
-                if (depth < pSize) next[depth] = 0;
-
+                if (depth < querySize) nextCandidate[depth] = 0;
                 found = true;
                 break;
             }
@@ -89,27 +91,17 @@ public class MoleculeWithVertices implements Molecule {
         }
         return false;
     }
-    private static boolean feasibleVertices(main.VF2.MoleculeWithVertices p,
-                                            main.VF2.MoleculeWithVertices t,
-                                            int[] mapping,
-                                            int uP, int uT) {
 
-        for (int i = 0; i < p.bonds.size(); i += 2) {
-            int a = p.bonds.get(i);
-            int b = p.bonds.get(i + 1);
-
-            if (a != uP && b != uP) continue;
-
-            int other = (a == uP) ? b : a;
+    private static boolean feasibleVertices(MoleculeWithVertices query, MoleculeWithVertices target, int[] mapping, int queryVertex, int targetVertex) {
+        for (int i = 0; i < query.bonds.size(); i += 2) {
+            int a = query.bonds.get(i);
+            int b = query.bonds.get(i + 1);
+            if (a != queryVertex && b != queryVertex) continue;
+            int other = (a == queryVertex) ? b : a;
             if (mapping[other] == -1) continue;
-
-            if (!t.isConnected(uT, mapping[other])) return false;
-
-            if (p.types.get(i / 2) !=
-                    t.getBondType(uT, mapping[other]))
-                return false;
+            if (!target.isConnected(targetVertex, mapping[other])) return false;
+            if (query.types.get(i / 2) != target.getBondType(targetVertex, mapping[other])) return false;
         }
         return true;
     }
-
 }
