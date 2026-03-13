@@ -3,6 +3,8 @@ package main;
 import java.util.ArrayList;
 
 public interface Molecule {
+    ArrayList<ArrayList<Integer>> bonds = new ArrayList<>();
+    Bytes getAtoms();
     void addAtom(byte a);
     void addBond(int i, int j, byte type);
     byte getAtom(int i);
@@ -11,4 +13,5 @@ public interface Molecule {
     byte getBondType(int i, int j);
 
     int size();
+
 }
