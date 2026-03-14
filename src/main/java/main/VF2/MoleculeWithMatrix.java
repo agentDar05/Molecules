@@ -5,7 +5,6 @@ import main.Bytes;
 import main.Molecule;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class MoleculeWithMatrix implements Molecule {
     Bytes atoms = new Bytes();
@@ -32,7 +31,15 @@ public class MoleculeWithMatrix implements Molecule {
         bonds[i][j] = bonds[j][i] = true;
         bondTypes[i][j] = bondTypes[j][i] = type;
     }
-
+    public ArrayList<Integer> getBonds(int atom) {
+        ArrayList <Integer> bondList = new ArrayList<>();
+        for(int i = 0; i < bonds[atom].length; i++){
+            if(bonds[atom][i]){
+                bondList.add(i);
+            }
+        }
+        return bondList;
+    }
     public int size() {
         return atoms.size();
     }

@@ -1,9 +1,6 @@
 package main;
 
 import main.VF2.MoleculeWithAdjacencyList;
-import main.VF2.MoleculeWithMatrix;
-import main.VF2.MoleculeWithVertices;
-import main.VF2.MoleculeWithVertices;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -394,7 +391,7 @@ public class Parser {
         return true;
     }
     public static MoleculeWithAdjacencyList MolV3000Reader() throws IOException {
-        String s = Files.readString(Path.of("src\\main\\java\\main\\ketcher.mol"));
+        String s = Files.readString(Path.of("src/main/java/main/ketcher.mol"));
         String[] split = s.split("M {2}");
         String[] inf = split[2].split(" ");
         MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
@@ -429,4 +426,7 @@ public class Parser {
         int type = Integer.parseInt(split[3]);
         return new int[]{atom1, atom2, type};
     }
+//    private static String MolV3000Writer (Molecule m){
+//
+//    }
 }

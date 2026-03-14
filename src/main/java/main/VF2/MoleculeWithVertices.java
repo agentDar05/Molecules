@@ -6,7 +6,6 @@ import main.Ints;
 import main.Molecule;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class MoleculeWithVertices implements Molecule {
     Bytes vertices = new Bytes();
@@ -15,24 +14,50 @@ public class MoleculeWithVertices implements Molecule {
     public Bytes getAtoms() {
         return vertices;
     }
-    public Bytes getTypes() {
-        return types;
-    }
-    public Ints getBonds(){
-        return bonds;
-    }
     public void addAtom(byte atom) {
         vertices.add(atom);
     }
 
     public void addBond(int i, int j) {
-        addBond(i, j, BondType.SINGLE);
+        if(bondCheck(i, j))
+            addBond(i, j, BondType.SINGLE);
     }
+public boolean bondCheck(int i, int j){
+            for (int k = 0; k < bonds.size(); k += 2) {
+                int a = bonds.get(k);
+                int b = bonds.get(k + 1);
 
+                if (a == i) {
+                    if (b == j) return false;
+                } else if (b == i) {
+                    if (a == j) return false;
+                }
+            }
+            return true;
+    }
     public void addBond(int i, int j, byte type) {
-        bonds.add(i);
-        bonds.add(j);
-        types.add(type);
+        if(bondCheck(i, j)){
+            bonds.add(i);
+            bonds.add(j);
+            types.add(type);
+        }
+    }
+    @Override
+    public ArrayList<Integer> getBonds(int atom) {
+        ArrayList<Integer> list = new ArrayList<>();
+
+        for (int k = 0; k < bonds.size(); k += 2) {
+            int a = bonds.get(k);
+            int b = bonds.get(k + 1);
+
+            if (a == atom) {
+                list.add(b);
+            } else if (b == atom) {
+                list.add(a);
+            }
+        }
+
+        return list;
     }
 
     public int size() {

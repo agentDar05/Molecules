@@ -3,6 +3,8 @@ package main.VF2;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 
+import java.util.ArrayList;
+
 public class MoleculeWithVerticesTest {
 
     @Test
@@ -42,5 +44,28 @@ public class MoleculeWithVerticesTest {
         Assertions.assertEquals(2, m.vertices.size());
         Assertions.assertTrue(m.bonds.isEmpty());
     }
+    @Test
+    public void returnBonds() {
+        MoleculeWithVertices m = new MoleculeWithVertices();
 
+        m.addAtom((byte) 6);
+        m.addAtom((byte) 7);
+        m.addAtom((byte) 5);
+        m.addAtom((byte) 1);
+        m.addAtom((byte) 2);
+        m.addAtom((byte) 4);
+        m.addAtom((byte) 3);
+
+        m.addBond(1, 0);
+        m.addBond(1, 2);
+        m.addBond(1, 3);
+        m.addBond(1, 4);
+        m.addBond(2, 5);
+        ArrayList<Integer> expected = new ArrayList<>();
+        expected.add(0);
+        expected.add(2);
+        expected.add(3);
+        expected.add(4);
+        Assertions.assertEquals(expected, m.getBonds(1));
+    }
 }

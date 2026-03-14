@@ -5,7 +5,6 @@ import main.Bytes;
 import main.Molecule;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class MoleculeWithAdjacencyList implements Molecule {
 
@@ -25,7 +24,7 @@ public class MoleculeWithAdjacencyList implements Molecule {
         atoms.add(atomType);
         bonds.add(new ArrayList<>());
     }
-
+    public ArrayList<Integer> getBonds(int atom) {return bonds.get(atom);}
     public void addBond(int i, int j) {
         addBond(i, j, BondType.SINGLE);
     }

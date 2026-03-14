@@ -2,6 +2,8 @@ package main.VF2;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 
+import java.util.ArrayList;
+
 public class MoleculeWithMatrixTest {
     @Test
     public void addAtom() {
@@ -61,5 +63,28 @@ public class MoleculeWithMatrixTest {
         m.addBond(1, 0);
         Assertions.assertTrue(m.bonds[0][1]);
     }
+    @Test
+    public void returnBonds() {
+        MoleculeWithMatrix m = new MoleculeWithMatrix();
 
+        m.addAtom((byte) 6);
+        m.addAtom((byte) 7);
+        m.addAtom((byte) 5);
+        m.addAtom((byte) 1);
+        m.addAtom((byte) 2);
+        m.addAtom((byte) 4);
+        m.addAtom((byte) 3);
+
+        m.addBond(1, 0);
+        m.addBond(1, 2);
+        m.addBond(1, 3);
+        m.addBond(1, 4);
+        m.addBond(2, 5);
+ArrayList<Integer> expected = new ArrayList<>();
+        expected.add(0);
+        expected.add(2);
+        expected.add(3);
+        expected.add(4);
+        Assertions.assertEquals(m.getBonds(1),expected);
+    }
 }
