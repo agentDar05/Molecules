@@ -394,7 +394,7 @@ public class Parser {
         return true;
     }
     public static MoleculeWithAdjacencyList MolV3000Reader() throws IOException {
-        String s = Files.readString(Path.of("D:\\projects\\Molecules\\src\\main\\java\\main\\ketcher.mol"));
+        String s = Files.readString(Path.of("src\\main\\java\\main\\ketcher.mol"));
         String[] split = s.split("M {2}");
         String[] inf = split[2].split(" ");
         MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
