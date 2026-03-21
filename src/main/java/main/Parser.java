@@ -2,7 +2,7 @@ package main;
 
 import main.VF2.MoleculeWithAdjacencyList;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -391,42 +391,276 @@ public class Parser {
         return true;
     }
     public static MoleculeWithAdjacencyList MolV3000Reader() throws IOException {
-        String s = Files.readString(Path.of("src/main/java/main/ketcher.mol"));
-        String[] split = s.split("M {2}");
-        String[] inf = split[2].split(" ");
+
+        java.io.InputStream is = MoleculeWithAdjacencyList.class
+                .getClassLoader()
+                .getResourceAsStream("ketcher.mol");
+
+        if (is == null) {
+            throw new FileNotFoundException("File not found in resources");
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+
         MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
-        int numberOfAtoms = Integer.parseInt(inf[2]);
-        int numberOfBonds =Integer.parseInt(inf[3]);
-        int atomsStartingIdx =4;
-        int atomsEndingIdx =atomsStartingIdx+numberOfAtoms-1;
-        int bondsStartingIdx =6+numberOfAtoms;
-        int bondsEndingIdx =bondsStartingIdx+numberOfBonds-1;
-        for (int currentAtom = atomsStartingIdx; currentAtom < atomsEndingIdx; currentAtom++) {
-            m.addAtom((byte)parseAtomLine(split[currentAtom]));
+
+        String line;
+        boolean inAtomBlock = false;
+        boolean inBondBlock = false;
+
+        while ((line = reader.readLine()) != null) {
+
+            line = line.trim();
+
+            if (line.contains("BEGIN ATOM")) {
+                inAtomBlock = true;
+                continue;
+            }
+
+            if (line.contains("END ATOM")) {
+                inAtomBlock = false;
+                continue;
+            }
+
+            if (line.contains("BEGIN BOND")) {
+                inBondBlock = true;
+                continue;
+            }
+
+            if (line.contains("END BOND")) {
+                inBondBlock = false;
+                continue;
+            }
+
+            if (inAtomBlock) {
+                m.addAtom((byte) parseAtomLine(line));
+            }
+
+            if (inBondBlock) {
+                int[] bond = parseBondLine(line);
+
+                m.addBond(
+                        (byte) (bond[0] - 1),
+                        (byte) (bond[1] - 1),
+                        (byte) bond[2]
+                );
+            }
         }
-        for (int currentBond = bondsStartingIdx; currentBond < bondsEndingIdx; currentBond++) {
-            m.addBond((byte)parseBondLine(split[currentBond])[0]-1, (byte)parseBondLine(split[currentBond])[1]-1, (byte)parseBondLine(split[currentBond])[2]);
-        }
-        System.out.println("Atoms: "+m.getAtoms());
-        System.out.println("Bonds: "+m.getBonds());
-        System.out.println("Bond types: "+ Arrays.deepToString(m.getTypes()));
+
+        reader.close();
+
+        System.out.println("Atoms: " + m.getAtoms());
+        System.out.println("Bonds: " + m.getBonds());
+        System.out.println("Bond types: " + Arrays.deepToString(m.getTypes()));
+
         return m;
     }
-    private static int parseAtomLine (String line){
-        System.out.println(line);
-        String[] split = line.split(" ");
-        return Utils.numberInPTable(split[2]);
+    private static int parseAtomLine(String line) {
+
+        int tokenIndex = 0;
+        StringBuilder token = new StringBuilder();
+
+        for (char c : line.toCharArray()) {
+
+            if (c == ' ') {
+                if (!token.isEmpty()) {
+                    tokenIndex++;
+
+                    if (tokenIndex == 3) {
+                        return Utils.numberInPTable(token.toString());
+                    }
+
+                    token.setLength(0);
+                }
+            } else {
+                token.append(c);
+            }
+        }
+
+        return Utils.numberInPTable(token.toString());
     }
     private static int[] parseBondLine(String line) {
-        line = line.trim();
-        String[] split = line.split("\\s+");
-        System.out.println(Arrays.toString(split));
-        int atom1 = Integer.parseInt(split[1]);
-        int atom2 = Integer.parseInt(split[2]);
-        int type = Integer.parseInt(split[3]);
-        return new int[]{atom1, atom2, type};
+
+        int[] result = new int[3];
+
+        int currentNumber = 0;
+        boolean reading = false;
+        int count = 0;
+
+        for (char c : line.toCharArray()) {
+
+            if (Character.isDigit(c)) {
+                currentNumber = currentNumber * 10 + (c - '0');
+                reading = true;
+            } else {
+                if (reading) {
+                    count++;
+
+                    if (count >= 2 && count <= 4) {
+                        result[count - 2] = currentNumber;
+                    }
+
+                    currentNumber = 0;
+                    reading = false;
+                }
+            }
+        }
+
+        if (reading) {
+            result[2] = currentNumber;
+        }
+
+        return result;
     }
-//    private static String MolV3000Writer (Molecule m){
-//
-//    }
+    public static void MolV3000Writer(MoleculeWithAdjacencyList m) throws IOException {
+
+        OutputStream os = new FileOutputStream("output.mol");
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("  -INDIGO-03132612062D\n\n");
+        sb.append("  0  0  0  0  0  0  0  0  0  0  0 V3000\n");
+        sb.append("M  V30 BEGIN CTAB\n");
+
+        int atomCount = m.size();
+        int bondCount = countBonds(m);
+
+        sb.append("M  V30 COUNTS ")
+                .append(atomCount).append(" ")
+                .append(bondCount)
+                .append(" 0 0 0\n");
+
+        sb.append("M  V30 BEGIN ATOM\n");
+        for (int i = 0; i < atomCount; i++) {
+            sb.append("M  V30 ")
+                    .append(i + 1).append(" ")
+                    .append(atomSymbol(m.getAtom(i)))
+                    .append(" 0.0 0.0 0.0 0\n");
+        }
+        sb.append("M  V30 END ATOM\n");
+
+        sb.append("M  V30 BEGIN BOND\n");
+        int bondIndex = 1;
+        for (int i = 0; i < atomCount; i++) {
+            for (int j : m.getBonds(i)) {
+                if (i < j) {
+                    sb.append("M  V30 ")
+                            .append(bondIndex++)
+                            .append(" ")
+                            .append(m.getBondType(i, j))
+                            .append(" ")
+                            .append(i + 1).append(" ")
+                            .append(j + 1)
+                            .append("\n");
+                }
+            }
+        }
+        sb.append("M  V30 END BOND\n");
+
+        sb.append("M  V30 END CTAB\n");
+        sb.append("M  END\n");
+
+        os.write(sb.toString().getBytes());
+        os.close();
+    }
+
+    private static int countBonds(MoleculeWithAdjacencyList m) {
+        int count = 0;
+        for (int i = 0; i < m.size(); i++) {
+            for (int j : m.getBonds(i)) {
+                if (i < j) count++;
+            }
+        }
+        return count;
+    }
+
+    private static String atomSymbol(int atomicNumber) {
+        return Utils.SYMBOLS[atomicNumber];
+    }
+    public static MoleculeWithAdjacencyList MolV3000ReaderV2() throws IOException {
+
+        InputStream is = MoleculeWithAdjacencyList.class
+                .getClassLoader()
+                .getResourceAsStream("ketcher.mol");
+
+        if (is == null) throw new RuntimeException("File not found");
+
+        MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
+
+        int c;
+
+        boolean inAtom = false;
+        boolean inBond = false;
+
+        int number = 0;
+        boolean readingNumber = false;
+
+        int tokenIndex = 0;
+
+        StringBuilder atomSymbol = new StringBuilder();
+
+        int[] bondData = new int[3];
+        while ((c = is.read()) != -1) {
+
+            if (c == '\n') {
+                tokenIndex = 0;
+                atomSymbol.setLength(0);
+                continue;
+            }
+
+            if (c == ' ') {
+                if (readingNumber) {
+                    tokenIndex++;
+
+                    if (inBond && tokenIndex >= 3 && tokenIndex <= 5) {
+                        bondData[tokenIndex - 3] = number;
+                    }
+
+                    number = 0;
+                    readingNumber = false;
+                }
+
+                if (atomSymbol.length() > 0) {
+                    tokenIndex++;
+
+                    if (inAtom && tokenIndex == 4) {
+                        m.addAtom((byte) Utils.numberInPTable(atomSymbol.toString()));
+                    }
+
+                    atomSymbol.setLength(0);
+                }
+
+                continue;
+            }
+
+            if (Character.isDigit(c)) {
+                number = number * 10 + (c - '0');
+                readingNumber = true;
+                continue;
+            }
+
+            if (Character.isLetter(c)) {
+                atomSymbol.append((char) c);
+                continue;
+            }
+
+            if (c == 'A') inAtom = true; // as in ATOM
+            if (c == 'B') inBond = true; // as in BOND
+            if (c == 'E') { // as in EMD
+                inAtom = false;
+                inBond = false;
+            }
+
+            if (inBond && c == '\r') {
+                m.addBond(
+                        bondData[0] - 1,
+                        bondData[1] - 1,
+                        (byte) bondData[2]
+                );
+            }
+        }
+
+        is.close();
+        return m;
+    }
 }

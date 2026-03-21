@@ -49,5 +49,19 @@ public class MoleculesParserBenchmark {
         }
         return mol;
     }
+    @Benchmark
+    @Warmup(iterations = 3, time = 5)
+    @Measurement(iterations = 3, time = 5)
+    @Fork(1)
+    public void MolV3000ReaderBench() throws IOException {
+        Parser.MolV3000Reader();
+    }
+    @Benchmark
+    @Warmup(iterations = 3, time = 5)
+    @Measurement(iterations = 3, time = 5)
+    @Fork(1)
+    public void MolV3000ReaderV2Bench() throws IOException {
+        Parser.MolV3000ReaderV2();
+    }
     }
 

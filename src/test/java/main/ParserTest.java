@@ -13,8 +13,37 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ParserTest {
     public static void main(String[] args) throws IOException {
-        Parser.MolV3000Reader();
+        MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
 
+        m.addAtom((byte) 5);
+        m.addAtom((byte) 5);
+        m.addAtom((byte) 5);
+        m.addAtom((byte) 6);
+        m.addAtom((byte) 0);
+        m.addAtom((byte) 0);
+        m.addAtom((byte) 0);
+        m.addAtom((byte) 0);
+        m.addAtom((byte) 7);
+        m.addAtom((byte) 0);
+        m.addAtom((byte) 0);
+        m.addAtom((byte) 7);
+        m.addAtom((byte) 0);
+
+        m.addBond(0, 1);
+        m.addBond(1, 2);
+        m.addBond(2, 3);
+        m.addBond(3, 4);
+        m.addBond(4, 5);
+        m.addBond(5, 6);
+        m.addBond(6, 7);
+        m.addBond(7, 8);
+        m.addBond(8, 9);
+        m.addBond(9, 10);
+        m.addBond(10, 11);
+        m.addBond(11, 12);
+        Parser.MolV3000Writer(m);
+        java.nio.file.Files.lines(java.nio.file.Path.of("output.mol"))
+                .forEach(System.out::println);
     }
 
     @Test
