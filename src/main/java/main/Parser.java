@@ -3,6 +3,7 @@ package main;
 import main.VF2.MoleculeWithAdjacencyList;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -390,70 +391,51 @@ public class Parser {
 
         return true;
     }
-    public static MoleculeWithAdjacencyList MolV3000Reader() throws IOException {
+    public static MoleculeWithAdjacencyList MolV3000Reader(InputStream is) throws IOException {
 
-        java.io.InputStream is = MoleculeWithAdjacencyList.class
-                .getClassLoader()
-                .getResourceAsStream("ketcher.mol");
-
-        if (is == null) {
-            throw new FileNotFoundException("File not found in resources");
-        }
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
         MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
 
         String line;
-        boolean inAtomBlock = false;
-        boolean inBondBlock = false;
 
         while ((line = reader.readLine()) != null) {
-
             line = line.trim();
 
-            if (line.contains("BEGIN ATOM")) {
-                inAtomBlock = true;
-                continue;
+            if (line.equals("M  V30 BEGIN ATOM")) {
+                parseInAtomBlock(m, reader);
             }
 
-            if (line.contains("END ATOM")) {
-                inAtomBlock = false;
-                continue;
-            }
-
-            if (line.contains("BEGIN BOND")) {
-                inBondBlock = true;
-                continue;
-            }
-
-            if (line.contains("END BOND")) {
-                inBondBlock = false;
-                continue;
-            }
-
-            if (inAtomBlock) {
-                m.addAtom((byte) parseAtomLine(line));
-            }
-
-            if (inBondBlock) {
-                int[] bond = parseBondLine(line);
-
-                m.addBond(
-                        (byte) (bond[0] - 1),
-                        (byte) (bond[1] - 1),
-                        (byte) bond[2]
-                );
+            if (line.equals("M  V30 BEGIN BOND")) {
+                parseInBondBlock(m, reader);
             }
         }
 
-        reader.close();
-
-        System.out.println("Atoms: " + m.getAtoms());
-        System.out.println("Bonds: " + m.getBonds());
-        System.out.println("Bond types: " + Arrays.deepToString(m.getTypes()));
-
         return m;
+    }
+    private static void parseInAtomBlock(Molecule m, BufferedReader lines) throws IOException {
+        String line;
+        while ((line = lines.readLine()) != null) {
+                line = line.trim();
+                if (line.equals("M  V30 END ATOM")) {
+                    return;
+                }
+                m.addAtom((byte) parseAtomLine(line));
+        }
+    }
+    private static void parseInBondBlock(Molecule m, BufferedReader lines) throws IOException {
+        String line;
+        while ((line = lines.readLine()) != null) {
+            line = line.trim();
+            if (line.equals("M  V30 END BOND")) {
+                return;
+            }
+            int[] bond = parseBondLine(line);
+            m.addBond(
+                    (byte) (bond[0] - 1),
+                    (byte) (bond[1] - 1),
+                    (byte) bond[2]
+            );
+        }
     }
     private static int parseAtomLine(String line) {
 
@@ -512,34 +494,20 @@ public class Parser {
 
         return result;
     }
-    public static void MolV3000Writer(MoleculeWithAdjacencyList m) throws IOException {
-
-        OutputStream os = new FileOutputStream("output.mol");
-
+    public static void MolV3000Writer(MoleculeWithAdjacencyList m, OutputStream os) throws IOException {
         StringBuilder sb = new StringBuilder();
-
-        sb.append("  -INDIGO-03132612062D\n\n");
-        sb.append("  0  0  0  0  0  0  0  0  0  0  0 V3000\n");
-        sb.append("M  V30 BEGIN CTAB\n");
-
+        sb.append("  -INDIGO-03132612062D\r\n\r\n");
+        sb.append("  0  0  0  0  0  0  0  0  0  0  0 V3000\r\n");
+        sb.append("M  V30 BEGIN CTAB\r\n");
         int atomCount = m.size();
         int bondCount = countBonds(m);
-
-        sb.append("M  V30 COUNTS ")
-                .append(atomCount).append(" ")
-                .append(bondCount)
-                .append(" 0 0 0\n");
-
-        sb.append("M  V30 BEGIN ATOM\n");
+        sb.append("M  V30 COUNTS ").append(atomCount).append(" ").append(bondCount).append(" 0 0 0\r\n");
+        sb.append("M  V30 BEGIN ATOM\r\n");
         for (int i = 0; i < atomCount; i++) {
-            sb.append("M  V30 ")
-                    .append(i + 1).append(" ")
-                    .append(atomSymbol(m.getAtom(i)))
-                    .append(" 0.0 0.0 0.0 0\n");
+            sb.append("M  V30 ").append(i + 1).append(" ").append(Utils.SYMBOLS[m.getAtom(i)]).append(" 0.0 0.0 0.0 0\r\n");
         }
-        sb.append("M  V30 END ATOM\n");
-
-        sb.append("M  V30 BEGIN BOND\n");
+        sb.append("M  V30 END ATOM\r\n");
+        sb.append("M  V30 BEGIN BOND\r\n");
         int bondIndex = 1;
         for (int i = 0; i < atomCount; i++) {
             for (int j : m.getBonds(i)) {
@@ -551,19 +519,15 @@ public class Parser {
                             .append(" ")
                             .append(i + 1).append(" ")
                             .append(j + 1)
-                            .append("\n");
+                            .append("\r\n");
                 }
             }
         }
-        sb.append("M  V30 END BOND\n");
-
-        sb.append("M  V30 END CTAB\n");
-        sb.append("M  END\n");
-
-        os.write(sb.toString().getBytes());
-        os.close();
+        sb.append("M  V30 END BOND\r\n");
+        sb.append("M  V30 END CTAB\r\n");
+        sb.append("M  END\r\n");
+        os.write(sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
-
     private static int countBonds(MoleculeWithAdjacencyList m) {
         int count = 0;
         for (int i = 0; i < m.size(); i++) {
@@ -573,12 +537,10 @@ public class Parser {
         }
         return count;
     }
-
     private static String atomSymbol(int atomicNumber) {
         return Utils.SYMBOLS[atomicNumber];
     }
     public static MoleculeWithAdjacencyList MolV3000ReaderV2() throws IOException {
-
         InputStream is = MoleculeWithAdjacencyList.class
                 .getClassLoader()
                 .getResourceAsStream("ketcher.mol");

@@ -54,7 +54,10 @@ public class MoleculesParserBenchmark {
     @Measurement(iterations = 3, time = 5)
     @Fork(1)
     public void MolV3000ReaderBench() throws IOException {
-        Parser.MolV3000Reader();
+        java.io.InputStream is = MoleculeWithAdjacencyList.class
+                .getClassLoader()
+                .getResourceAsStream("ketcher.mol");
+        Parser.MolV3000Reader(is);
     }
     @Benchmark
     @Warmup(iterations = 3, time = 5)
