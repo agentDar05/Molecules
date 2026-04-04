@@ -9,62 +9,56 @@ import org.openscience.cdk.silent.Atom;
 import org.openscience.cdk.silent.AtomContainer;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 public class MoleculesParserBenchmark {
 
     public static void main(String[] args) throws IOException {
         org.openjdk.jmh.Main.main(new String[]{"MoleculesParserBenchmark"});
     }
-
-    @Benchmark
-    @Warmup(iterations = 3, time = 5)
-    @Measurement(iterations = 3, time = 5)
-    @Fork(1)
-        public IAtomContainer cdkImplementation() {
-            IAtomContainer mol = new AtomContainer();
-
-            for (int i = 0; i < 5; i++) {
-                mol.addAtom(new Atom("C"));
-            }
-
-            for (int i = 0; i < 5 - 1; i++) {
-                mol.addBond(i, i + 1, org.openscience.cdk.interfaces.IBond.Order.SINGLE);
-            }
-
-            return mol;
-        }
-    @Benchmark
-    @Warmup(iterations = 3, time = 5)
-    @Measurement(iterations = 3, time = 5)
-    @Fork(1)
-    public Molecule myImplementation() {
-        Molecule mol = new MoleculeWithAdjacencyList();
-
-        for (int i = 0; i < 5; i++) {
-            mol.addAtom((byte) 0);
-        }
-
-        for (int i = 0; i < 5 - 1; i++) {
-            mol.addBond(i, i + 1, (byte) 0);
-        }
-        return mol;
-    }
+//
+//    @Benchmark
+//    @Warmup(iterations = 3, time = 5)
+//    @Measurement(iterations = 3, time = 5)
+//    @Fork(1)
+//        public IAtomContainer cdkImplementation() {
+//            IAtomContainer mol = new AtomContainer();
+//
+//            for (int i = 0; i < 5; i++) {
+//                mol.addAtom(new Atom("C"));
+//            }
+//
+//            for (int i = 0; i < 5 - 1; i++) {
+//                mol.addBond(i, i + 1, org.openscience.cdk.interfaces.IBond.Order.SINGLE);
+//            }
+//
+//            return mol;
+//        }
+//    @Benchmark
+//    @Warmup(iterations = 3, time = 5)
+//    @Measurement(iterations = 3, time = 5)
+//    @Fork(1)
+//    public Molecule myImplementation() {
+//        Molecule mol = new MoleculeWithAdjacencyList();
+//
+//        for (int i = 0; i < 5; i++) {
+//            mol.addAtom((byte) 0);
+//        }
+//
+//        for (int i = 0; i < 5 - 1; i++) {
+//            mol.addBond(i, i + 1, (byte) 0);
+//        }
+//        return mol;
+//    }
     @Benchmark
     @Warmup(iterations = 3, time = 5)
     @Measurement(iterations = 3, time = 5)
     @Fork(1)
     public void MolV3000ReaderBench() throws IOException {
-        java.io.InputStream is = MoleculeWithAdjacencyList.class
+        InputStream is = getClass()
                 .getClassLoader()
                 .getResourceAsStream("ketcher.mol");
         Parser.MolV3000Reader(is);
-    }
-    @Benchmark
-    @Warmup(iterations = 3, time = 5)
-    @Measurement(iterations = 3, time = 5)
-    @Fork(1)
-    public void MolV3000ReaderV2Bench() throws IOException {
-        Parser.MolV3000ReaderV2();
     }
     }
 

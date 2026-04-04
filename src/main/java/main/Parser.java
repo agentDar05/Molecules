@@ -415,12 +415,13 @@ public class Parser {
     private static void parseInAtomBlock(Molecule m, BufferedReader lines) throws IOException {
         String line;
         while ((line = lines.readLine()) != null) {
-                line = line.trim();
-                if (line.equals("M  V30 END ATOM")) {
-                    return;
-                }
-                m.addAtom((byte) parseAtomLine(line));
+            line = line.trim();
+            if (line.equals("M  V30 END ATOM")) {
+                return;
+            }
+            m.addAtom((byte) parseAtomLine(line));
         }
+        throw new IllegalArgumentException("Missing 'M  V30 END ATOM' block");
     }
     private static void parseInBondBlock(Molecule m, BufferedReader lines) throws IOException {
         String line;
@@ -436,62 +437,75 @@ public class Parser {
                     (byte) bond[2]
             );
         }
+        throw new IllegalArgumentException("Missing 'M  V30 END ATOM' block");
+    }
+    public static int indexOf(byte[] bytes, int start, byte b){
+        int i = start;
+        for (; i < bytes.length; i++){
+            if (bytes[i] == b) return i;
+        }
+        return -1;
+    }
+    public static int indexOf(byte[] bytes, byte b){
+        int i = 0;
+        for (; i < bytes.length; i++){
+            if (bytes[i] == b) return i;
+        }
+        return -1;
     }
     private static int parseAtomLine(String line) {
+        int space0 = line.indexOf(' ');
+        int space1 = line.indexOf(' ', space0 + 1 );
+        int space2 = line.indexOf(' ', space1 + 1 );
+        int space3 = line.indexOf(' ', space2 + 1 );
+        int space4 = line.indexOf(' ', space3 + 1 );
 
-        int tokenIndex = 0;
-        StringBuilder token = new StringBuilder();
-
-        for (char c : line.toCharArray()) {
-
-            if (c == ' ') {
-                if (!token.isEmpty()) {
-                    tokenIndex++;
-
-                    if (tokenIndex == 3) {
-                        return Utils.numberInPTable(token.toString());
-                    }
-
-                    token.setLength(0);
-                }
-            } else {
-                token.append(c);
-            }
+        if (space0 == -1 || space1 == -1 || space2 == -1) {
+            throw new IllegalArgumentException("Invalid atom line, not enough tokens: " + line);
         }
-
-        return Utils.numberInPTable(token.toString());
+        String element = line.substring(space3+1,  space4);
+        return Utils.numberInPTable(element);
     }
+    /**
+     * Parses a bond line and extracts three integers:
+     * the indices of two atoms and the bond type.
+     * The method scans the line character by character,
+     * collects numeric tokens, and returns the 2nd, 3rd,
+     * and 4th numbers found in the line.
+     * Example:
+     * Input:  "1  2  1  0  0"
+     * Output: [2, 1, 0]
+     * @param line a string representing a bond line
+     * @return an array of three integers:
+     *         [atom1Index, atom2Index, bondType]
+     * @throws IllegalArgumentException if fewer than 4 numbers are found
+     */
     private static int[] parseBondLine(String line) {
-
         int[] result = new int[3];
-
         int currentNumber = 0;
-        boolean reading = false;
         int count = 0;
-
         for (char c : line.toCharArray()) {
-
             if (Character.isDigit(c)) {
                 currentNumber = currentNumber * 10 + (c - '0');
-                reading = true;
             } else {
-                if (reading) {
+                if (currentNumber != 0) {
                     count++;
-
                     if (count >= 2 && count <= 4) {
                         result[count - 2] = currentNumber;
                     }
-
                     currentNumber = 0;
-                    reading = false;
                 }
             }
         }
-
-        if (reading) {
-            result[2] = currentNumber;
+        if (currentNumber != 0) {
+            count++;
+            if (count >= 2 && count <= 4) {
+                result[count - 2] = currentNumber;
+            }
         }
-
+        if (count < 4) {
+            throw new IllegalArgumentException("Invalid bond line: not enough numbers -> " + line);
+        }
         return result;
     }
     public static void MolV3000Writer(MoleculeWithAdjacencyList m, OutputStream os) throws IOException {

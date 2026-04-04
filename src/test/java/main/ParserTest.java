@@ -5,7 +5,10 @@ import main.VF2.MoleculeWithVertices;
 import main.VF2.MoleculeWithAdjacencyList;
 import org.junit.jupiter.api.Test;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import static main.Parser.isSubgraph;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -14,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ParserTest {
     public static void main(String[] args) throws IOException {
         MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
+        OutputStream os = new FileOutputStream("output.mol");
 
         m.addAtom((byte) 5);
         m.addAtom((byte) 5);
@@ -41,11 +45,10 @@ public class ParserTest {
         m.addBond(9, 10);
         m.addBond(10, 11);
         m.addBond(11, 12);
-        Parser.MolV3000Writer(m);
+        Parser.MolV3000Writer(m, os);
         java.nio.file.Files.lines(java.nio.file.Path.of("output.mol"))
                 .forEach(System.out::println);
     }
-
     @Test
     void alcoholAdjacency_positive() {
         MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
