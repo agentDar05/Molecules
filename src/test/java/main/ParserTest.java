@@ -23,6 +23,7 @@ public class ParserTest {
         m.addAtom((byte) 5);
         m.addAtom((byte) 5);
         m.addAtom((byte) 6);
+
         m.addAtom((byte) 0);
         m.addAtom((byte) 0);
         m.addAtom((byte) 0);
@@ -48,6 +49,13 @@ public class ParserTest {
         Parser.MolV3000Writer(m, os);
         java.nio.file.Files.lines(java.nio.file.Path.of("output.mol"))
                 .forEach(System.out::println);
+    }
+    @Test
+    void testReader() throws IOException {
+        InputStream is = getClass()
+                .getClassLoader()
+                .getResourceAsStream("ketcher.mol");
+        Parser.MolV3000Reader(is);
     }
     @Test
     void alcoholAdjacency_positive() {

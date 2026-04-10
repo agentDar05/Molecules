@@ -432,8 +432,8 @@ public class Parser {
             }
             int[] bond = parseBondLine(line);
             m.addBond(
-                    (byte) (bond[0] - 1),
-                    (byte) (bond[1] - 1),
+                    (byte) (bond[0]),
+                    (byte) (bond[1]),
                     (byte) bond[2]
             );
         }
@@ -469,44 +469,27 @@ public class Parser {
     /**
      * Parses a bond line and extracts three integers:
      * the indices of two atoms and the bond type.
-     * The method scans the line character by character,
-     * collects numeric tokens, and returns the 2nd, 3rd,
-     * and 4th numbers found in the line.
+     * The method divides line into separate blocks of numbers and returns the 2nd, 3rd,
+     * and 4th blocks of the line.
      * Example:
-     * Input:  "1  2  1  0  0"
-     * Output: [2, 1, 0]
+     * Input:  "1  2  1  3"
+     * Output: [1, 3, 2]
      * @param line a string representing a bond line
      * @return an array of three integers:
      *         [atom1Index, atom2Index, bondType]
-     * @throws IllegalArgumentException if fewer than 4 numbers are found
      */
     private static int[] parseBondLine(String line) {
-        int[] result = new int[3];
-        int currentNumber = 0;
-        int count = 0;
-        for (char c : line.toCharArray()) {
-            if (Character.isDigit(c)) {
-                currentNumber = currentNumber * 10 + (c - '0');
-            } else {
-                if (currentNumber != 0) {
-                    count++;
-                    if (count >= 2 && count <= 4) {
-                        result[count - 2] = currentNumber;
-                    }
-                    currentNumber = 0;
-                }
-            }
-        }
-        if (currentNumber != 0) {
-            count++;
-            if (count >= 2 && count <= 4) {
-                result[count - 2] = currentNumber;
-            }
-        }
-        if (count < 4) {
-            throw new IllegalArgumentException("Invalid bond line: not enough numbers -> " + line);
-        }
-        return result;
+        int space0 = line.indexOf(' ');
+        int space1 = line.indexOf(' ', space0 + 1 );
+        int space2 = line.indexOf(' ', space1 + 1 );
+        int space3 = line.indexOf(' ', space2 + 1 );
+        int space4 = line.indexOf(' ', space3 + 1 );
+        int space5 = line.indexOf(' ', space4 + 1 );
+        int space6 = line.length();
+        int bondType = Integer.parseInt(line.substring(space3+1,  space4));
+        int element1 = Integer.parseInt(line.substring(space4+1,  space5)) -1;
+        int element2 = Integer.parseInt(line.substring(space5+1,  space6)) -1 ;
+        return new int[]{bondType, element1, element2};
     }
     public static void MolV3000Writer(MoleculeWithAdjacencyList m, OutputStream os) throws IOException {
         StringBuilder sb = new StringBuilder();
