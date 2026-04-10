@@ -1,64 +1,41 @@
 package perf;
 
-import main.Molecule;
+import main.MolV3000;
 import main.Parser;
-import main.VF2.MoleculeWithAdjacencyList;
 import org.openjdk.jmh.annotations.*;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.silent.Atom;
-import org.openscience.cdk.silent.AtomContainer;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+@Warmup(iterations = 3, time = 5)
+@Measurement(iterations = 3, time = 5)
+@Fork(1)
 public class MoleculesParserBenchmark {
-
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         org.openjdk.jmh.Main.main(new String[]{"MoleculesParserBenchmark"});
     }
-//
-//    @Benchmark
-//    @Warmup(iterations = 3, time = 5)
-//    @Measurement(iterations = 3, time = 5)
-//    @Fork(1)
-//        public IAtomContainer cdkImplementation() {
-//            IAtomContainer mol = new AtomContainer();
-//
-//            for (int i = 0; i < 5; i++) {
-//                mol.addAtom(new Atom("C"));
-//            }
-//
-//            for (int i = 0; i < 5 - 1; i++) {
-//                mol.addBond(i, i + 1, org.openscience.cdk.interfaces.IBond.Order.SINGLE);
-//            }
-//
-//            return mol;
-//        }
-//    @Benchmark
-//    @Warmup(iterations = 3, time = 5)
-//    @Measurement(iterations = 3, time = 5)
-//    @Fork(1)
-//    public Molecule myImplementation() {
-//        Molecule mol = new MoleculeWithAdjacencyList();
-//
-//        for (int i = 0; i < 5; i++) {
-//            mol.addAtom((byte) 0);
-//        }
-//
-//        for (int i = 0; i < 5 - 1; i++) {
-//            mol.addBond(i, i + 1, (byte) 0);
-//        }
-//        return mol;
-//    }
-    @Benchmark
-    @Warmup(iterations = 3, time = 5)
-    @Measurement(iterations = 3, time = 5)
-    @Fork(1)
-    public void MolV3000ReaderBench() throws IOException {
-        InputStream is = getClass()
-                .getClassLoader()
-                .getResourceAsStream("ketcher.mol");
-        Parser.MolV3000Reader(is);
+    @State(Scope.Benchmark)
+    public static class BenchmarkState {
+        byte[] data;
+        @Setup
+        public void setup() throws IOException {
+            InputStream is = MoleculesParserBenchmark.class
+                    .getClassLoader()
+                    .getResourceAsStream("ketcher.mol");
+
+            if (is == null) {
+                throw new RuntimeException("File not found: ketcher.mol");
+            }
+
+            data = is.readAllBytes();
+            is.close();
+        }
     }
+    @Benchmark
+    public void MolV3000ReaderBench(BenchmarkState state) throws IOException {
+        InputStream is = new ByteArrayInputStream(state.data);
+        MolV3000.reader(is);
     }
 
+}

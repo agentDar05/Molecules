@@ -2,11 +2,10 @@ package main;
 
 import main.VF2.MoleculeWithAdjacencyList;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Parser {
     Map<Integer, Integer> storage = new HashMap<>();
@@ -266,7 +265,7 @@ public class Parser {
         throw new IllegalArgumentException("Unmatched '(' at position " + open);
     }
 
-    public static boolean isAlcoholAdjacency(MoleculeWithAdjacencyList m){
+    public static boolean isAlcoholAdjacency(MoleculeWithAdjacencyList m) {
         MoleculeWithAdjacencyList oh = new MoleculeWithAdjacencyList();
         oh.addAtom(H); // 0
         oh.addAtom(O); // 1
@@ -276,7 +275,8 @@ public class Parser {
         return isSubgraph(oh, m);
 
     }
-//    public static boolean isAlcoholMatrix(MoleculeWithMatrix m){
+
+    //    public static boolean isAlcoholMatrix(MoleculeWithMatrix m){
 //        MoleculeWithMatrix oh = new MoleculeWithMatrix();
 //        oh.addAtom(H); // 0
 //        oh.addAtom(O); // 1
@@ -294,7 +294,7 @@ public class Parser {
 //        oh.addBond(2, 1);
 //        return isSubgraph(oh, m);
 //    }
-    public static boolean isCarboxylicAcidAdjacency(main.VF2.MoleculeWithAdjacencyList m){
+    public static boolean isCarboxylicAcidAdjacency(main.VF2.MoleculeWithAdjacencyList m) {
         main.VF2.MoleculeWithAdjacencyList cooh = new main.VF2.MoleculeWithAdjacencyList();
         cooh.addAtom(H); // 0
         cooh.addAtom(O); // 1
@@ -305,7 +305,8 @@ public class Parser {
         cooh.addBond(2, 0, BondType.SINGLE);
         return isSubgraph(cooh, m);
     }
-//    public static boolean isCarboxylicAcidMatrix(main.VF2.MoleculeWithMatrix m){
+
+    //    public static boolean isCarboxylicAcidMatrix(main.VF2.MoleculeWithMatrix m){
 //        main.VF2.MoleculeWithMatrix cooh = new main.VF2.MoleculeWithMatrix();
 //        cooh.addAtom(H); // 0
 //        cooh.addAtom(O); // 1
@@ -370,7 +371,8 @@ public class Parser {
 
         return false;
     }
-    private static boolean isFeasible(MoleculeWithAdjacencyList query,MoleculeWithAdjacencyList target, int[] queryToTarget, int queryAtom, int targetAtom) {
+
+    private static boolean isFeasible(MoleculeWithAdjacencyList query, MoleculeWithAdjacencyList target, int[] queryToTarget, int queryAtom, int targetAtom) {
 
         ArrayList<Integer> targetNeighbors = target.bonds.get(targetAtom);
 
@@ -391,235 +393,24 @@ public class Parser {
 
         return true;
     }
-    public static MoleculeWithAdjacencyList MolV3000Reader(InputStream is) throws IOException {
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-        MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
-
-        String line;
-
-        while ((line = reader.readLine()) != null) {
-            line = line.trim();
-
-            if (line.equals("M  V30 BEGIN ATOM")) {
-                parseInAtomBlock(m, reader);
-            }
-
-            if (line.equals("M  V30 BEGIN BOND")) {
-                parseInBondBlock(m, reader);
-            }
-        }
-
-        return m;
-    }
-    private static void parseInAtomBlock(Molecule m, BufferedReader lines) throws IOException {
-        String line;
-        while ((line = lines.readLine()) != null) {
-            line = line.trim();
-            if (line.equals("M  V30 END ATOM")) {
-                return;
-            }
-            m.addAtom((byte) parseAtomLine(line));
-        }
-        throw new IllegalArgumentException("Missing 'M  V30 END ATOM' block");
-    }
-    private static void parseInBondBlock(Molecule m, BufferedReader lines) throws IOException {
-        String line;
-        while ((line = lines.readLine()) != null) {
-            line = line.trim();
-            if (line.equals("M  V30 END BOND")) {
-                return;
-            }
-            int[] bond = parseBondLine(line);
-            m.addBond(
-                    (byte) (bond[0]),
-                    (byte) (bond[1]),
-                    (byte) bond[2]
-            );
-        }
-        throw new IllegalArgumentException("Missing 'M  V30 END ATOM' block");
-    }
-    public static int indexOf(byte[] bytes, int start, byte b){
+    public static int indexOf(byte[] bytes, int start, byte b) {
         int i = start;
-        for (; i < bytes.length; i++){
+        for (; i < bytes.length; i++) {
             if (bytes[i] == b) return i;
         }
         return -1;
     }
-    public static int indexOf(byte[] bytes, byte b){
-        int i = 0;
-        for (; i < bytes.length; i++){
-            if (bytes[i] == b) return i;
-        }
-        return -1;
-    }
-    private static int parseAtomLine(String line) {
-        int space0 = line.indexOf(' ');
-        int space1 = line.indexOf(' ', space0 + 1 );
-        int space2 = line.indexOf(' ', space1 + 1 );
-        int space3 = line.indexOf(' ', space2 + 1 );
-        int space4 = line.indexOf(' ', space3 + 1 );
 
-        if (space0 == -1 || space1 == -1 || space2 == -1) {
-            throw new IllegalArgumentException("Invalid atom line, not enough tokens: " + line);
+    public static int indexOf(byte[] bytes, byte b) {
+        int i = 0;
+        for (; i < bytes.length; i++) {
+            if (bytes[i] == b) return i;
         }
-        String element = line.substring(space3+1,  space4);
-        return Utils.numberInPTable(element);
+        return -1;
     }
-    /**
-     * Parses a bond line and extracts three integers:
-     * the indices of two atoms and the bond type.
-     * The method divides line into separate blocks of numbers and returns the 2nd, 3rd,
-     * and 4th blocks of the line.
-     * Example:
-     * Input:  "1  2  1  3"
-     * Output: [1, 3, 2]
-     * @param line a string representing a bond line
-     * @return an array of three integers:
-     *         [atom1Index, atom2Index, bondType]
-     */
-    private static int[] parseBondLine(String line) {
-        int space0 = line.indexOf(' ');
-        int space1 = line.indexOf(' ', space0 + 1 );
-        int space2 = line.indexOf(' ', space1 + 1 );
-        int space3 = line.indexOf(' ', space2 + 1 );
-        int space4 = line.indexOf(' ', space3 + 1 );
-        int space5 = line.indexOf(' ', space4 + 1 );
-        int space6 = line.length();
-        int bondType = Integer.parseInt(line.substring(space3+1,  space4));
-        int element1 = Integer.parseInt(line.substring(space4+1,  space5)) -1;
-        int element2 = Integer.parseInt(line.substring(space5+1,  space6)) -1 ;
-        return new int[]{bondType, element1, element2};
-    }
-    public static void MolV3000Writer(MoleculeWithAdjacencyList m, OutputStream os) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        sb.append("  -INDIGO-03132612062D\r\n\r\n");
-        sb.append("  0  0  0  0  0  0  0  0  0  0  0 V3000\r\n");
-        sb.append("M  V30 BEGIN CTAB\r\n");
-        int atomCount = m.size();
-        int bondCount = countBonds(m);
-        sb.append("M  V30 COUNTS ").append(atomCount).append(" ").append(bondCount).append(" 0 0 0\r\n");
-        sb.append("M  V30 BEGIN ATOM\r\n");
-        for (int i = 0; i < atomCount; i++) {
-            sb.append("M  V30 ").append(i + 1).append(" ").append(Utils.SYMBOLS[m.getAtom(i)]).append(" 0.0 0.0 0.0 0\r\n");
-        }
-        sb.append("M  V30 END ATOM\r\n");
-        sb.append("M  V30 BEGIN BOND\r\n");
-        int bondIndex = 1;
-        for (int i = 0; i < atomCount; i++) {
-            for (int j : m.getBonds(i)) {
-                if (i < j) {
-                    sb.append("M  V30 ")
-                            .append(bondIndex++)
-                            .append(" ")
-                            .append(m.getBondType(i, j))
-                            .append(" ")
-                            .append(i + 1).append(" ")
-                            .append(j + 1)
-                            .append("\r\n");
-                }
-            }
-        }
-        sb.append("M  V30 END BOND\r\n");
-        sb.append("M  V30 END CTAB\r\n");
-        sb.append("M  END\r\n");
-        os.write(sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
-    }
-    private static int countBonds(MoleculeWithAdjacencyList m) {
-        int count = 0;
-        for (int i = 0; i < m.size(); i++) {
-            for (int j : m.getBonds(i)) {
-                if (i < j) count++;
-            }
-        }
-        return count;
-    }
+
     private static String atomSymbol(int atomicNumber) {
         return Utils.SYMBOLS[atomicNumber];
-    }
-    public static MoleculeWithAdjacencyList MolV3000ReaderV2() throws IOException {
-        InputStream is = MoleculeWithAdjacencyList.class
-                .getClassLoader()
-                .getResourceAsStream("ketcher.mol");
-
-        if (is == null) throw new RuntimeException("File not found");
-
-        MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
-
-        int c;
-
-        boolean inAtom = false;
-        boolean inBond = false;
-
-        int number = 0;
-        boolean readingNumber = false;
-
-        int tokenIndex = 0;
-
-        StringBuilder atomSymbol = new StringBuilder();
-
-        int[] bondData = new int[3];
-        while ((c = is.read()) != -1) {
-
-            if (c == '\n') {
-                tokenIndex = 0;
-                atomSymbol.setLength(0);
-                continue;
-            }
-
-            if (c == ' ') {
-                if (readingNumber) {
-                    tokenIndex++;
-
-                    if (inBond && tokenIndex >= 3 && tokenIndex <= 5) {
-                        bondData[tokenIndex - 3] = number;
-                    }
-
-                    number = 0;
-                    readingNumber = false;
-                }
-
-                if (atomSymbol.length() > 0) {
-                    tokenIndex++;
-
-                    if (inAtom && tokenIndex == 4) {
-                        m.addAtom((byte) Utils.numberInPTable(atomSymbol.toString()));
-                    }
-
-                    atomSymbol.setLength(0);
-                }
-
-                continue;
-            }
-
-            if (Character.isDigit(c)) {
-                number = number * 10 + (c - '0');
-                readingNumber = true;
-                continue;
-            }
-
-            if (Character.isLetter(c)) {
-                atomSymbol.append((char) c);
-                continue;
-            }
-
-            if (c == 'A') inAtom = true; // as in ATOM
-            if (c == 'B') inBond = true; // as in BOND
-            if (c == 'E') { // as in EMD
-                inAtom = false;
-                inBond = false;
-            }
-
-            if (inBond && c == '\r') {
-                m.addBond(
-                        bondData[0] - 1,
-                        bondData[1] - 1,
-                        (byte) bondData[2]
-                );
-            }
-        }
-
-        is.close();
-        return m;
     }
 }

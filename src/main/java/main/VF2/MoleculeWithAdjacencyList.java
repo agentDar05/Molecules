@@ -17,7 +17,7 @@ public class MoleculeWithAdjacencyList implements Molecule {
     public byte[][] getTypes() {
         return bondTypes;
     }
-    public ArrayList<ArrayList<Integer>> getBonds(){
+    public ArrayList<ArrayList<Integer>> getAllBonds(){
         return bonds;
     }
     public void addAtom(byte atomType) {
@@ -61,6 +61,5 @@ public class MoleculeWithAdjacencyList implements Molecule {
     public byte getBondType(int i, int j) {
         return bondTypes[i][j];
     }
-
 
 }

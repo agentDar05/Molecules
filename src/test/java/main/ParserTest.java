@@ -1,62 +1,15 @@
 package main;
 
-import main.VF2.MoleculeWithMatrix;
-import main.VF2.MoleculeWithVertices;
 import main.VF2.MoleculeWithAdjacencyList;
 import org.junit.jupiter.api.Test;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 import static main.Parser.isSubgraph;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ParserTest {
-    public static void main(String[] args) throws IOException {
-        MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
-        OutputStream os = new FileOutputStream("output.mol");
-
-        m.addAtom((byte) 5);
-        m.addAtom((byte) 5);
-        m.addAtom((byte) 5);
-        m.addAtom((byte) 6);
-
-        m.addAtom((byte) 0);
-        m.addAtom((byte) 0);
-        m.addAtom((byte) 0);
-        m.addAtom((byte) 0);
-        m.addAtom((byte) 7);
-        m.addAtom((byte) 0);
-        m.addAtom((byte) 0);
-        m.addAtom((byte) 7);
-        m.addAtom((byte) 0);
-
-        m.addBond(0, 1);
-        m.addBond(1, 2);
-        m.addBond(2, 3);
-        m.addBond(3, 4);
-        m.addBond(4, 5);
-        m.addBond(5, 6);
-        m.addBond(6, 7);
-        m.addBond(7, 8);
-        m.addBond(8, 9);
-        m.addBond(9, 10);
-        m.addBond(10, 11);
-        m.addBond(11, 12);
-        Parser.MolV3000Writer(m, os);
-        java.nio.file.Files.lines(java.nio.file.Path.of("output.mol"))
-                .forEach(System.out::println);
-    }
-    @Test
-    void testReader() throws IOException {
-        InputStream is = getClass()
-                .getClassLoader()
-                .getResourceAsStream("ketcher.mol");
-        Parser.MolV3000Reader(is);
-    }
     @Test
     void alcoholAdjacency_positive() {
         MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
