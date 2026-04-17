@@ -7,7 +7,7 @@ public interface Molecule {
     Bytes getAtoms();
 
     ArrayList<Integer> getBonds(int atom);
-    void addAtom(byte a);
+    int addAtom(byte a);
     void addBond(int i, int j, byte type);
     void addBond(int i, int j);
     byte getAtom(int i);

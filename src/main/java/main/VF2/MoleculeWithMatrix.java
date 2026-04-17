@@ -19,8 +19,9 @@ public class MoleculeWithMatrix implements Molecule {
     public boolean[][] getBonds(){
         return bonds;
     }
-    public void addAtom(byte atom) {
+    public int addAtom(byte atom) {
         atoms.add(atom);
+        return  atoms.size()-1;
     }
 
     public void addBond(int i, int j) {

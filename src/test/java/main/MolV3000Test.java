@@ -10,10 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MolV3000Test {
     @Test
-    void writer_emptyMolecule_positive() throws IOException {
+    void write_emptyMolecule_positive() throws IOException {
         Molecule m = new MoleculeWithAdjacencyList();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        MolV3000.writer(m, os);
+        MolV3000.write(m, os);
         String actual = os.toString();
         String expected = "\n" +
                 "  -MolV3000Writer\n" +
@@ -32,7 +32,7 @@ public class MolV3000Test {
     }
 
     @Test
-    void writer_writesCorrectMolecule() throws IOException {
+    void write_writesCorrectMolecule() throws IOException {
         Molecule m = new MoleculeWithAdjacencyList();
         OutputStream os = new FileOutputStream("output.mol");
         m.addAtom((byte) 15);
@@ -46,16 +46,16 @@ public class MolV3000Test {
         m.addBond(0, 3);
         m.addBond(2, 4);
         m.addBond(3, 5);
-        MolV3000.writer(m, os);
+        MolV3000.write(m, os);
         java.nio.file.Files.lines(java.nio.file.Path.of("output.mol"))
                 .forEach(System.out::println);
     }
     @Test
-    void reader_readMolecule() throws IOException {
+    void read_readMolecule() throws IOException {
         InputStream is = MoleculesParserBenchmark.class
                 .getClassLoader()
                 .getResourceAsStream("ketcher.mol");
-        MoleculeWithAdjacencyList output = (MoleculeWithAdjacencyList) MolV3000.reader(is);
+        MoleculeWithAdjacencyList output = (MoleculeWithAdjacencyList) MolV3000.read(is);
         MoleculeWithAdjacencyList expected = new  MoleculeWithAdjacencyList();
         expected.addAtom((byte) 15);
         expected.addAtom((byte)7);
@@ -69,5 +69,27 @@ public class MolV3000Test {
         expected.addBond(2, 4);
         expected.addBond(3, 5);
 
+    }
+    @Test
+    void readAndWriteMolecules() throws IOException {
+        InputStream is = MoleculesParserBenchmark.class
+                .getClassLoader()
+                .getResourceAsStream("ketcher.mol");
+        OutputStream os = new FileOutputStream("output.mol");
+        MoleculeWithAdjacencyList expected = new  MoleculeWithAdjacencyList();
+        expected.addAtom((byte) 15);
+        expected.addAtom((byte)7);
+        expected.addAtom((byte)7);
+        expected.addAtom((byte)7);
+        expected.addAtom((byte)0);
+        expected.addAtom((byte)0);
+        expected.addBond(0, 1, BondType.DOUBLE);
+        expected.addBond(0, 2);
+        expected.addBond(0, 3);
+        expected.addBond(2, 4);
+        expected.addBond(3, 5);
+        MolV3000.write(MolV3000.read(is), os);
+        java.nio.file.Files.lines(java.nio.file.Path.of("output.mol"))
+                .forEach(System.out::println);
     }
 }

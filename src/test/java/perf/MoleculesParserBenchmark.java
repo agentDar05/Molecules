@@ -1,7 +1,6 @@
 package perf;
 
 import main.MolV3000;
-import main.Parser;
 import org.openjdk.jmh.annotations.*;
 
 import java.io.ByteArrayInputStream;
@@ -35,7 +34,7 @@ public class MoleculesParserBenchmark {
     @Benchmark
     public void MolV3000ReaderBench(BenchmarkState state) throws IOException {
         InputStream is = new ByteArrayInputStream(state.data);
-        MolV3000.reader(is);
+        MolV3000.read(is);
     }
 
 }

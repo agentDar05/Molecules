@@ -20,9 +20,10 @@ public class MoleculeWithAdjacencyList implements Molecule {
     public ArrayList<ArrayList<Integer>> getAllBonds(){
         return bonds;
     }
-    public void addAtom(byte atomType) {
+    public int addAtom(byte atomType) {
         atoms.add(atomType);
         bonds.add(new ArrayList<>());
+        return atoms.size()-1;
     }
     public ArrayList<Integer> getBonds(int atom) {return bonds.get(atom);}
     public void addBond(int i, int j) {

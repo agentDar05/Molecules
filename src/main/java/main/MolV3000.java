@@ -8,10 +8,11 @@ import java.nio.charset.StandardCharsets;
 public class MolV3000 {
     /**
      * Creates MolV3000 file of given Molecule
-     * @param m Molecule
+     *
+     * @param m  Molecule
      * @param os OutputStream where the MolV3000 will be stored
      */
-    public static void writer(Molecule m, OutputStream os) throws IOException {
+    public static void write(Molecule m, OutputStream os) throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append("\n");
         sb.append("  -MolV3000Writer\n\n");
@@ -46,37 +47,52 @@ public class MolV3000 {
         sb.append("M  END");
         os.write(sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
-/**
- * Reads MolV3000 file and transforms it in Molecule, storing atoms, bonds and bond types
- * @param is InputStream, file that Reader will parse
- * @return Molecule
- * */
 
-    public static Molecule reader(InputStream is) throws IOException {
+    /**
+     * Reads MolV3000 file and transforms it in Molecule, storing atoms, bonds and bond types
+     *
+     * @param is InputStream, file that Reader will parse
+     * @return Molecule
+     *
+     */
+
+    public static Molecule read(InputStream is) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
         MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
-
+        boolean wasInAtomBlock = false;
+        boolean wasInBondBlock = false;
         String line;
 
         while ((line = reader.readLine()) != null) {
             line = line.trim();
 
             if (line.equals("M  V30 BEGIN ATOM")) {
+                wasInAtomBlock = true;
                 parseInAtomBlock(m, reader);
             }
 
             if (line.equals("M  V30 BEGIN BOND")) {
+                wasInBondBlock = true;
                 parseInBondBlock(m, reader);
             }
         }
-
+        if (!wasInAtomBlock) {
+            throw new IllegalArgumentException("Cannot read InputStream, missing atom block");
+        }
+        if (!wasInBondBlock) {
+            throw new IllegalArgumentException("Cannot read InputStream, missing bond block");
+        }
         return m;
+
     }
+
     /**
      * Counts bonds in given Molecule
+     *
      * @param m Molecule
      * @return number of bonds
-     * */
+     *
+     */
     private static int countBonds(Molecule m) {
         int count = 0;
         for (int i = 0; i < m.size(); i++) {
@@ -86,11 +102,14 @@ public class MolV3000 {
         }
         return count;
     }
+
     /**
      * Parses atom block, adds atoms into a given molecule
-     * @param m Molecule
+     *
+     * @param m     Molecule
      * @param lines BufferedReader
-     * */
+     *
+     */
     private static void parseInAtomBlock(Molecule m, BufferedReader lines) throws IOException {
         String line;
         while ((line = lines.readLine()) != null) {
@@ -102,11 +121,14 @@ public class MolV3000 {
         }
         throw new IllegalArgumentException("Missing 'M  V30 END ATOM' block");
     }
+
     /**
      * Parses bond block, adds bonds into a given molecule
-     * @param m Molecule
+     *
+     * @param m     Molecule
      * @param lines BufferedReader
-     * */
+     *
+     */
     private static void parseInBondBlock(Molecule m, BufferedReader lines) throws IOException {
         String line;
         while ((line = lines.readLine()) != null) {
@@ -123,24 +145,27 @@ public class MolV3000 {
         }
         throw new IllegalArgumentException("Missing 'M  V30 END ATOM' block");
     }
+
     /**
      * The method divides line into separate blocks and finds atom index
+     *
      * @param line String - line that will be parsed
      * @return integer that represents index of an atom in periodic table
      */
     private static int parseAtomLine(String line) {
         int space0 = line.indexOf(' ');
-        int space1 = line.indexOf(' ', space0 + 1 );
-        int space2 = line.indexOf(' ', space1 + 1 );
-        int space3 = line.indexOf(' ', space2 + 1 );
-        int space4 = line.indexOf(' ', space3 + 1 );
+        int space1 = line.indexOf(' ', space0 + 1);
+        int space2 = line.indexOf(' ', space1 + 1);
+        int space3 = line.indexOf(' ', space2 + 1);
+        int space4 = line.indexOf(' ', space3 + 1);
 
-        if (space0 == -1 || space1 == -1 || space2 == -1 ||  space3 == -1 || space4 == -1) {
+        if (space0 == -1 || space1 == -1 || space2 == -1 || space3 == -1 || space4 == -1) {
             throw new IllegalArgumentException("Invalid atom line, not enough tokens: " + line);
         }
-        String element = line.substring(space3+1,  space4);
+        String element = line.substring(space3 + 1, space4);
         return Parser.Utils.numberInPTable(element);
     }
+
     /**
      * Parses a bond line and extracts three integers:
      * the indices of two atoms and the bond type.
@@ -149,24 +174,25 @@ public class MolV3000 {
      * Example:
      * Input:  "1  2  1  3"
      * Output: [1, 3, 2]
+     *
      * @param line a string representing a bond line
      * @return an array of three integers:
-     *         [atom1Index, atom2Index, bondType]
+     * [atom1Index, atom2Index, bondType]
      */
     private static int[] parseBondLine(String line) {
         int space0 = line.indexOf(' ');
-        int space1 = line.indexOf(' ', space0 + 1 );
-        int space2 = line.indexOf(' ', space1 + 1 );
-        int space3 = line.indexOf(' ', space2 + 1 );
-        int space4 = line.indexOf(' ', space3 + 1 );
-        int space5 = line.indexOf(' ', space4 + 1 );
+        int space1 = line.indexOf(' ', space0 + 1);
+        int space2 = line.indexOf(' ', space1 + 1);
+        int space3 = line.indexOf(' ', space2 + 1);
+        int space4 = line.indexOf(' ', space3 + 1);
+        int space5 = line.indexOf(' ', space4 + 1);
         int space6 = line.length();
-        if (space0 == -1 || space1 == -1 || space2 == -1 ||  space3 == -1 || space4 == -1 || space5 == -1) {
+        if (space0 == -1 || space1 == -1 || space2 == -1 || space3 == -1 || space4 == -1 || space5 == -1) {
             throw new IllegalArgumentException("Invalid atom line, not enough tokens: " + line);
         }
-        int bondType = Integer.parseInt(line.substring(space3+1,  space4));
-        int element1 = Integer.parseInt(line.substring(space4+1,  space5)) -1;
-        int element2 = Integer.parseInt(line.substring(space5+1,  space6)) -1 ;
-        return new int[]{bondType, element1, element2};
+        int bondType = Integer.parseInt(line.substring(space3 + 1, space4));
+        int element1 = Integer.parseInt(line.substring(space4 + 1, space5)) - 1;
+        int element2 = Integer.parseInt(line.substring(space5 + 1, space6)) - 1;
+        return new int[]{element1, element2, bondType};
     }
 }
