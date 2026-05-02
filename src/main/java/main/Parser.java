@@ -372,7 +372,7 @@ public class Parser {
         return false;
     }
 
-    private static boolean isFeasible(MoleculeWithAdjacencyList query, MoleculeWithAdjacencyList target, int[] queryToTarget, int queryAtom, int targetAtom) {
+    static boolean isFeasible(MoleculeWithAdjacencyList query, MoleculeWithAdjacencyList target, int[] queryToTarget, int queryAtom, int targetAtom) {
 
         ArrayList<Integer> targetNeighbors = target.bonds.get(targetAtom);
 
