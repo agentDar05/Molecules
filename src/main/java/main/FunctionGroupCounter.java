@@ -58,4 +58,40 @@ class FunctionGroupCounter {
         }
         return count;
     }
+    public static int countAlcohol(MoleculeWithAdjacencyList target){
+        MoleculeWithAdjacencyList ohGroup = new MoleculeWithAdjacencyList();
+        int c = ohGroup.addAtom((byte) 6);
+        int o = ohGroup.addAtom((byte) 8);
+        int h = ohGroup.addAtom((byte) 1);
+        ohGroup.addBond(c, o);
+        ohGroup.addBond(o, h);
+        return countSubgraphs(ohGroup, target);
+    }
+    public static int countCarboxylic(MoleculeWithAdjacencyList target){
+        MoleculeWithAdjacencyList coohGroup = new MoleculeWithAdjacencyList();
+        int c = coohGroup.addAtom((byte) 6);
+        int o = coohGroup.addAtom((byte) 8);
+        int o2 = coohGroup.addAtom((byte) 8);
+        int h = coohGroup.addAtom((byte) 1);
+        coohGroup.addBond(c, o2, BondType.DOUBLE);
+        coohGroup.addBond(c, o);
+        coohGroup.addBond(o, h);
+        return countSubgraphs(coohGroup, target);
+    }
+    public static int countAldehyde(MoleculeWithAdjacencyList target){
+        MoleculeWithAdjacencyList aldehydeGroup = new MoleculeWithAdjacencyList();
+        int c = aldehydeGroup.addAtom((byte) 6);
+        int h = aldehydeGroup.addAtom((byte) 1);
+        int o = aldehydeGroup.addAtom((byte) 8);
+        aldehydeGroup.addBond(c, h);
+        aldehydeGroup.addBond(c, o, BondType.DOUBLE);
+        return countSubgraphs(aldehydeGroup, target);
+    }
+    public static int countNitrile(MoleculeWithAdjacencyList target){
+        MoleculeWithAdjacencyList nitrileGroup = new MoleculeWithAdjacencyList();
+        int c = nitrileGroup.addAtom((byte) 6);
+        int n = nitrileGroup.addAtom((byte) 7);
+        nitrileGroup.addBond(c, n, BondType.TRIPLE);
+        return countSubgraphs(nitrileGroup, target);
+    }
 }
