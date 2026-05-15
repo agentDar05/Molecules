@@ -94,4 +94,50 @@ class FunctionGroupCounter {
         nitrileGroup.addBond(c, n, BondType.TRIPLE);
         return countSubgraphs(nitrileGroup, target);
     }
+    public static int countBenzeneRings(MoleculeWithAdjacencyList target){
+        MoleculeWithAdjacencyList ring = new MoleculeWithAdjacencyList();
+        int c1 = ring.addAtom((byte) 6);
+        int c2 = ring.addAtom((byte) 6);
+        int c3 = ring.addAtom((byte) 6);
+        int c4 = ring.addAtom((byte) 6);
+        int c5 = ring.addAtom((byte) 6);
+        int c6 = ring.addAtom((byte) 6);
+        int h7 = ring.addAtom((byte) 1);
+        int h8 = ring.addAtom((byte) 1);
+        int h9 = ring.addAtom((byte) 1);
+        int h10 = ring.addAtom((byte) 1);
+        int h11 = ring.addAtom((byte) 1);
+        int h12 = ring.addAtom((byte) 1);
+        ring.addBond(c3, c1, BondType.DOUBLE);
+        ring.addBond(c1, c5, BondType.SINGLE);
+        ring.addBond(c5, c6, BondType.DOUBLE);
+        ring.addBond(c6, c4, BondType.SINGLE);
+        ring.addBond(c4, c2, BondType.DOUBLE);
+        ring.addBond(c2, c3, BondType.SINGLE);
+        ring.addBond(c1, h7, BondType.SINGLE);
+        ring.addBond(c2, h8, BondType.SINGLE);
+        ring.addBond(c3, h9, BondType.SINGLE);
+        ring.addBond(c4, h10, BondType.SINGLE);
+        ring.addBond(c5, h11, BondType.SINGLE);
+        ring.addBond(c6, h12, BondType.SINGLE);
+        return countSubgraphs(ring, target);
+    }
+    public static int countAromaticRings(MoleculeWithAdjacencyList target) {
+        MoleculeWithAdjacencyList ring = new MoleculeWithAdjacencyList();
+        int c1 = ring.addAtom((byte) 6);
+        int c2 = ring.addAtom((byte) 6);
+        int c3 = ring.addAtom((byte) 6);
+        int c4 = ring.addAtom((byte) 6);
+        int c5 = ring.addAtom((byte) 6);
+        int c6 = ring.addAtom((byte) 6);
+
+        ring.addBond(c1, c2, BondType.AROMATIC);
+        ring.addBond(c2, c3, BondType.AROMATIC);
+        ring.addBond(c3, c4, BondType.AROMATIC);
+        ring.addBond(c4, c5, BondType.AROMATIC);
+        ring.addBond(c5, c6, BondType.AROMATIC);
+        ring.addBond(c6, c1, BondType.AROMATIC);
+
+        return countSubgraphs(ring, target);
+    }
 }
