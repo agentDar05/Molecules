@@ -94,6 +94,32 @@ class FunctionGroupCounter {
         nitrileGroup.addBond(c, n, BondType.TRIPLE);
         return countSubgraphs(nitrileGroup, target);
     }
+    public static int countPhenyl(MoleculeWithAdjacencyList target){
+        MoleculeWithAdjacencyList phenyl = new MoleculeWithAdjacencyList();
+        int c1 = phenyl.addAtom((byte) 6);
+        int c2 = phenyl.addAtom((byte) 6);
+        int c3 = phenyl.addAtom((byte) 6);
+        int c4 = phenyl.addAtom((byte) 6);
+        int c5 = phenyl.addAtom((byte) 6);
+        int c6 = phenyl.addAtom((byte) 6);
+        int h7 = phenyl.addAtom((byte) 1);
+        int h8 = phenyl.addAtom((byte) 1);
+        int h9 = phenyl.addAtom((byte) 1);
+        int h10 = phenyl.addAtom((byte) 1);
+        int h11 = phenyl.addAtom((byte) 1);
+        phenyl.addBond(c3, c1, BondType.DOUBLE);
+        phenyl.addBond(c1, c5, BondType.SINGLE);
+        phenyl.addBond(c5, c6, BondType.DOUBLE);
+        phenyl.addBond(c6, c4, BondType.SINGLE);
+        phenyl.addBond(c4, c2, BondType.DOUBLE);
+        phenyl.addBond(c2, c3, BondType.SINGLE);
+        phenyl.addBond(c1, h7, BondType.SINGLE);
+        phenyl.addBond(c2, h8, BondType.SINGLE);
+        phenyl.addBond(c3, h9, BondType.SINGLE);
+        phenyl.addBond(c4, h10, BondType.SINGLE);
+        phenyl.addBond(c5, h11, BondType.SINGLE);
+        return countSubgraphs(phenyl, target);
+    }
     public static int countBenzeneRings(MoleculeWithAdjacencyList target){
         MoleculeWithAdjacencyList ring = new MoleculeWithAdjacencyList();
         int c1 = ring.addAtom((byte) 6);
