@@ -58,6 +58,9 @@ public class MolV3000 {
 
     public static Molecule read(InputStream is) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+        if (new String(is.readAllBytes(), StandardCharsets.UTF_8).length() < 170){
+            throw new IOException("Invalid MolV3000 file: file too short");
+        }
         MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
         boolean wasInAtomBlock = false;
         boolean wasInBondBlock = false;
