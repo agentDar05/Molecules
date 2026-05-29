@@ -15,6 +15,9 @@ class FunctionGroupCounter {
     public static final MoleculeWithAdjacencyList PHENYL_GROUP = new MoleculeWithAdjacencyList();
     public static final MoleculeWithAdjacencyList RING = new MoleculeWithAdjacencyList();
     public static final MoleculeWithAdjacencyList AROMATIC_RING = new MoleculeWithAdjacencyList();
+    public static final MoleculeWithAdjacencyList KETO_TAUTOMER = new MoleculeWithAdjacencyList();
+    public static final MoleculeWithAdjacencyList ENOL_TAUTOMER = new MoleculeWithAdjacencyList();
+
     static{
         int c_oh_group = OH_GROUP.addAtom((byte) 6);
         int o_oh_group = OH_GROUP.addAtom((byte) 8);
@@ -100,6 +103,34 @@ class FunctionGroupCounter {
         AROMATIC_RING.addBond(c4_aromatic, c5_aromatic, BondType.AROMATIC);
         AROMATIC_RING.addBond(c5_aromatic, c6_aromatic, BondType.AROMATIC);
         AROMATIC_RING.addBond(c6_aromatic, c1_aromatic, BondType.AROMATIC);
+
+        int c1_enol = ENOL_TAUTOMER.addAtom((byte) 6); // 1
+        int c2_enol = ENOL_TAUTOMER.addAtom((byte) 6); // 2
+        int o_enol = ENOL_TAUTOMER.addAtom((byte) 8); // 3
+        int any1_enol = ENOL_TAUTOMER.addAtom((byte) 0); // 4
+        int any2_enol = ENOL_TAUTOMER.addAtom((byte) 0);// 5
+        int any3_enol = ENOL_TAUTOMER.addAtom((byte) 0); // 6
+        int h_enol = ENOL_TAUTOMER.addAtom((byte) 1); // 7
+        ENOL_TAUTOMER.addBond(c1_enol, c2_enol, BondType.DOUBLE);
+        ENOL_TAUTOMER.addBond(c1_enol, o_enol, BondType.SINGLE);
+        ENOL_TAUTOMER.addBond(c1_enol, any1_enol, BondType.SINGLE);
+        ENOL_TAUTOMER.addBond(c2_enol, any2_enol, BondType.SINGLE);
+        ENOL_TAUTOMER.addBond(c2_enol, any3_enol, BondType.SINGLE);
+        ENOL_TAUTOMER.addBond(o_enol, h_enol, BondType.SINGLE);
+
+        int c1_keto = KETO_TAUTOMER.addAtom((byte) 6); // 1
+        int c2_keto = KETO_TAUTOMER.addAtom((byte) 6); // 2
+        int o_keto = KETO_TAUTOMER.addAtom((byte) 8); // 3
+        int any1_keto = KETO_TAUTOMER.addAtom((byte) 0); // 4
+        int any2_keto = KETO_TAUTOMER.addAtom((byte) 0);// 5
+        int any3_keto = KETO_TAUTOMER.addAtom((byte) 0); // 6
+        int h_keto = KETO_TAUTOMER.addAtom((byte) 1); // 7
+        KETO_TAUTOMER.addBond(c1_keto, c2_keto, BondType.SINGLE);
+        KETO_TAUTOMER.addBond(c1_keto, o_keto, BondType.DOUBLE);
+        KETO_TAUTOMER.addBond(c1_keto, any1_keto, BondType.SINGLE);
+        KETO_TAUTOMER.addBond(c2_keto, any2_keto, BondType.SINGLE);
+        KETO_TAUTOMER.addBond(c2_keto, any3_keto, BondType.SINGLE);
+        KETO_TAUTOMER.addBond(c2_keto, h_keto, BondType.SINGLE);
     }
     public static int countSubgraphs(MoleculeWithAdjacencyList query, MoleculeWithAdjacencyList target) {
         int queryAtomCount = query.size();
@@ -169,7 +200,8 @@ class FunctionGroupCounter {
     public static int countBenzeneRings(MoleculeWithAdjacencyList target){
         return countSubgraphs(RING, target);
     }
-    public static int countAromaticRings(MoleculeWithAdjacencyList target) {
-        return countSubgraphs(AROMATIC_RING, target);
-    }
+    public static int countAromaticRings(MoleculeWithAdjacencyList target) {return countSubgraphs(AROMATIC_RING, target);}
+    public static int countKeto(MoleculeWithAdjacencyList target) {return countSubgraphs(KETO_TAUTOMER, target);}
+    public static int countEnol(MoleculeWithAdjacencyList target) {return countSubgraphs(ENOL_TAUTOMER, target);}
+
 }
