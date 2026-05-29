@@ -112,5 +112,86 @@ public class FunctionGroupCounterTest {
         assertEquals(0, result);
     }
 
+    @Test
+    void double_single_phenyl(){
+        MoleculeWithAdjacencyList phenyl = new MoleculeWithAdjacencyList();
+        int c1_phenyl = phenyl.addAtom((byte) 6);
+        int c2_phenyl = phenyl.addAtom((byte) 6);
+        int c3_phenyl = phenyl.addAtom((byte) 6);
+        int c4_phenyl = phenyl.addAtom((byte) 6);
+        int c5_phenyl = phenyl.addAtom((byte) 6);
+        int c6_phenyl = phenyl.addAtom((byte) 6);
+        int h7_phenyl = phenyl.addAtom((byte) 1);
+        int h8_phenyl = phenyl.addAtom((byte) 1);
+        int h9_phenyl = phenyl.addAtom((byte) 1);
+        int h10_phenyl = phenyl.addAtom((byte) 1);
+        int h11_phenyl = phenyl.addAtom((byte) 1);
+        phenyl.addBond(c3_phenyl, c1_phenyl, BondType.DOUBLE);
+        phenyl.addBond(c1_phenyl, c5_phenyl, BondType.SINGLE);
+        phenyl.addBond(c5_phenyl, c6_phenyl, BondType.DOUBLE);
+        phenyl.addBond(c6_phenyl, c4_phenyl, BondType.SINGLE);
+        phenyl.addBond(c4_phenyl, c2_phenyl, BondType.DOUBLE);
+        phenyl.addBond(c2_phenyl, c3_phenyl, BondType.SINGLE);
+        phenyl.addBond(c1_phenyl, h7_phenyl, BondType.SINGLE);
+        phenyl.addBond(c2_phenyl, h8_phenyl, BondType.SINGLE);
+        phenyl.addBond(c3_phenyl, h9_phenyl, BondType.SINGLE);
+        phenyl.addBond(c4_phenyl, h10_phenyl, BondType.SINGLE);
+        phenyl.addBond(c5_phenyl, h11_phenyl, BondType.SINGLE);
+        assertEquals(1, FunctionGroupCounter.countPhenyl(phenyl));
+    }
+    @Test
+    void single_double_phenyl(){
+        MoleculeWithAdjacencyList phenyl = new MoleculeWithAdjacencyList();
+        int c1_phenyl = phenyl.addAtom((byte) 6);
+        int c2_phenyl = phenyl.addAtom((byte) 6);
+        int c3_phenyl = phenyl.addAtom((byte) 6);
+        int c4_phenyl = phenyl.addAtom((byte) 6);
+        int c5_phenyl = phenyl.addAtom((byte) 6);
+        int c6_phenyl = phenyl.addAtom((byte) 6);
+        int h7_phenyl = phenyl.addAtom((byte) 1);
+        int h8_phenyl = phenyl.addAtom((byte) 1);
+        int h9_phenyl = phenyl.addAtom((byte) 1);
+        int h10_phenyl = phenyl.addAtom((byte) 1);
+        int h11_phenyl = phenyl.addAtom((byte) 1);
+        phenyl.addBond(c3_phenyl, c1_phenyl, BondType.SINGLE);
+        phenyl.addBond(c1_phenyl, c5_phenyl, BondType.DOUBLE);
+        phenyl.addBond(c5_phenyl, c6_phenyl, BondType.SINGLE);
+        phenyl.addBond(c6_phenyl, c4_phenyl, BondType.DOUBLE);
+        phenyl.addBond(c4_phenyl, c2_phenyl, BondType.SINGLE);
+        phenyl.addBond(c2_phenyl, c3_phenyl, BondType.DOUBLE);
+        phenyl.addBond(c1_phenyl, h7_phenyl, BondType.SINGLE);
+        phenyl.addBond(c2_phenyl, h8_phenyl, BondType.SINGLE);
+        phenyl.addBond(c3_phenyl, h9_phenyl, BondType.SINGLE);
+        phenyl.addBond(c4_phenyl, h10_phenyl, BondType.SINGLE);
+        phenyl.addBond(c5_phenyl, h11_phenyl, BondType.SINGLE);
+        assertEquals(1, FunctionGroupCounter.countPhenyl(phenyl));
 
+    }
+    @Test
+    void phenyl_zero(){
+        MoleculeWithAdjacencyList phenyl = new MoleculeWithAdjacencyList();
+        int n_phenyl = phenyl.addAtom((byte) 7);
+        int c2_phenyl = phenyl.addAtom((byte) 6);
+        int c3_phenyl = phenyl.addAtom((byte) 6);
+        int c4_phenyl = phenyl.addAtom((byte) 6);
+        int c5_phenyl = phenyl.addAtom((byte) 6);
+        int c6_phenyl = phenyl.addAtom((byte) 6);
+        int h7_phenyl = phenyl.addAtom((byte) 1);
+        int h8_phenyl = phenyl.addAtom((byte) 1);
+        int h9_phenyl = phenyl.addAtom((byte) 1);
+        int h10_phenyl = phenyl.addAtom((byte) 1);
+        int h11_phenyl = phenyl.addAtom((byte) 1);
+        phenyl.addBond(c3_phenyl, n_phenyl, BondType.SINGLE);
+        phenyl.addBond(n_phenyl, c5_phenyl, BondType.DOUBLE);
+        phenyl.addBond(c5_phenyl, c6_phenyl, BondType.SINGLE);
+        phenyl.addBond(c6_phenyl, c4_phenyl, BondType.DOUBLE);
+        phenyl.addBond(c4_phenyl, c2_phenyl, BondType.SINGLE);
+        phenyl.addBond(c2_phenyl, c3_phenyl, BondType.DOUBLE);
+        phenyl.addBond(n_phenyl, h7_phenyl, BondType.SINGLE);
+        phenyl.addBond(c2_phenyl, h8_phenyl, BondType.SINGLE);
+        phenyl.addBond(c3_phenyl, h9_phenyl, BondType.SINGLE);
+        phenyl.addBond(c4_phenyl, h10_phenyl, BondType.SINGLE);
+        phenyl.addBond(c5_phenyl, h11_phenyl, BondType.SINGLE);
+        assertEquals(0, FunctionGroupCounter.countPhenyl(phenyl));
+    }
 }
