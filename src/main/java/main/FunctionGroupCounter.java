@@ -8,6 +8,99 @@ import java.util.Arrays;
 import static main.Parser.isFeasible;
 
 class FunctionGroupCounter {
+    public static final MoleculeWithAdjacencyList OH_GROUP = new MoleculeWithAdjacencyList();
+    public static final MoleculeWithAdjacencyList COOH_GROUP = new MoleculeWithAdjacencyList();
+    public static final MoleculeWithAdjacencyList ALDEHYDE_GROUP = new MoleculeWithAdjacencyList();
+    public static final MoleculeWithAdjacencyList NITRILE_GROUP = new MoleculeWithAdjacencyList();
+    public static final MoleculeWithAdjacencyList PHENYL_GROUP = new MoleculeWithAdjacencyList();
+    public static final MoleculeWithAdjacencyList RING = new MoleculeWithAdjacencyList();
+    public static final MoleculeWithAdjacencyList AROMATIC_RING = new MoleculeWithAdjacencyList();
+    static{
+        int c_oh_group = OH_GROUP.addAtom((byte) 6);
+        int o_oh_group = OH_GROUP.addAtom((byte) 8);
+        int h_oh_group = OH_GROUP.addAtom((byte) 1);
+        OH_GROUP.addBond(c_oh_group, o_oh_group);
+        OH_GROUP.addBond(o_oh_group, h_oh_group);
+
+        int c_cooh_group = COOH_GROUP.addAtom((byte) 6);
+        int o_cooh_group = COOH_GROUP.addAtom((byte) 8);
+        int o2_cooh_group = COOH_GROUP.addAtom((byte) 8);
+        int h_cooh_group = COOH_GROUP.addAtom((byte) 1);
+        COOH_GROUP.addBond(c_cooh_group, o2_cooh_group, BondType.DOUBLE);
+        COOH_GROUP.addBond(c_cooh_group, o_cooh_group);
+        COOH_GROUP.addBond(o_cooh_group, h_cooh_group);
+
+        int c_aldehyde_group = ALDEHYDE_GROUP.addAtom((byte) 6);
+        int h_aldehyde_group = ALDEHYDE_GROUP.addAtom((byte) 1);
+        int o_aldehyde_group = ALDEHYDE_GROUP.addAtom((byte) 8);
+        ALDEHYDE_GROUP.addBond(c_aldehyde_group, h_aldehyde_group);
+        ALDEHYDE_GROUP.addBond(c_aldehyde_group, o_aldehyde_group, BondType.DOUBLE);
+
+        int c_nitrile = NITRILE_GROUP.addAtom((byte) 6);
+        int n_nitrile = NITRILE_GROUP.addAtom((byte) 7);
+        NITRILE_GROUP.addBond(c_nitrile, n_nitrile, BondType.TRIPLE);
+
+        int c1_phenyl = PHENYL_GROUP.addAtom((byte) 6);
+        int c2_phenyl = PHENYL_GROUP.addAtom((byte) 6);
+        int c3_phenyl = PHENYL_GROUP.addAtom((byte) 6);
+        int c4_phenyl = PHENYL_GROUP.addAtom((byte) 6);
+        int c5_phenyl = PHENYL_GROUP.addAtom((byte) 6);
+        int c6_phenyl = PHENYL_GROUP.addAtom((byte) 6);
+        int h7_phenyl = PHENYL_GROUP.addAtom((byte) 1);
+        int h8_phenyl = PHENYL_GROUP.addAtom((byte) 1);
+        int h9_phenyl = PHENYL_GROUP.addAtom((byte) 1);
+        int h10_phenyl = PHENYL_GROUP.addAtom((byte) 1);
+        int h11_phenyl = PHENYL_GROUP.addAtom((byte) 1);
+        PHENYL_GROUP.addBond(c3_phenyl, c1_phenyl, BondType.DOUBLE);
+        PHENYL_GROUP.addBond(c1_phenyl, c5_phenyl, BondType.SINGLE);
+        PHENYL_GROUP.addBond(c5_phenyl, c6_phenyl, BondType.DOUBLE);
+        PHENYL_GROUP.addBond(c6_phenyl, c4_phenyl, BondType.SINGLE);
+        PHENYL_GROUP.addBond(c4_phenyl, c2_phenyl, BondType.DOUBLE);
+        PHENYL_GROUP.addBond(c2_phenyl, c3_phenyl, BondType.SINGLE);
+        PHENYL_GROUP.addBond(c1_phenyl, h7_phenyl, BondType.SINGLE);
+        PHENYL_GROUP.addBond(c2_phenyl, h8_phenyl, BondType.SINGLE);
+        PHENYL_GROUP.addBond(c3_phenyl, h9_phenyl, BondType.SINGLE);
+        PHENYL_GROUP.addBond(c4_phenyl, h10_phenyl, BondType.SINGLE);
+        PHENYL_GROUP.addBond(c5_phenyl, h11_phenyl, BondType.SINGLE);
+
+        int c1_ring = RING.addAtom((byte) 6);
+        int c2_ring = RING.addAtom((byte) 6);
+        int c3_ring = RING.addAtom((byte) 6);
+        int c4_ring = RING.addAtom((byte) 6);
+        int c5_ring = RING.addAtom((byte) 6);
+        int c6_ring = RING.addAtom((byte) 6);
+        int h7_ring = RING.addAtom((byte) 1);
+        int h8_ring = RING.addAtom((byte) 1);
+        int h9_ring = RING.addAtom((byte) 1);
+        int h10_ring = RING.addAtom((byte) 1);
+        int h11_ring = RING.addAtom((byte) 1);
+        int h12_ring = RING.addAtom((byte) 1);
+        RING.addBond(c3_ring, c1_ring, BondType.DOUBLE);
+        RING.addBond(c1_ring, c5_ring, BondType.SINGLE);
+        RING.addBond(c5_ring, c6_ring, BondType.DOUBLE);
+        RING.addBond(c6_ring, c4_ring, BondType.SINGLE);
+        RING.addBond(c4_ring, c2_ring, BondType.DOUBLE);
+        RING.addBond(c2_ring, c3_ring, BondType.SINGLE);
+        RING.addBond(c1_ring, h7_ring, BondType.SINGLE);
+        RING.addBond(c2_ring, h8_ring, BondType.SINGLE);
+        RING.addBond(c3_ring, h9_ring, BondType.SINGLE);
+        RING.addBond(c4_ring, h10_ring, BondType.SINGLE);
+        RING.addBond(c5_ring, h11_ring, BondType.SINGLE);
+        RING.addBond(c6_ring, h12_ring, BondType.SINGLE);
+
+        int c1_aromatic = AROMATIC_RING.addAtom((byte) 6);
+        int c2_aromatic = AROMATIC_RING.addAtom((byte) 6);
+        int c3_aromatic = AROMATIC_RING.addAtom((byte) 6);
+        int c4_aromatic = AROMATIC_RING.addAtom((byte) 6);
+        int c5_aromatic = AROMATIC_RING.addAtom((byte) 6);
+        int c6_aromatic = AROMATIC_RING.addAtom((byte) 6);
+        AROMATIC_RING.addBond(c1_aromatic, c2_aromatic, BondType.AROMATIC);
+        AROMATIC_RING.addBond(c2_aromatic, c3_aromatic, BondType.AROMATIC);
+        AROMATIC_RING.addBond(c3_aromatic, c4_aromatic, BondType.AROMATIC);
+        AROMATIC_RING.addBond(c4_aromatic, c5_aromatic, BondType.AROMATIC);
+        AROMATIC_RING.addBond(c5_aromatic, c6_aromatic, BondType.AROMATIC);
+        AROMATIC_RING.addBond(c6_aromatic, c1_aromatic, BondType.AROMATIC);
+    }
     public static int countSubgraphs(MoleculeWithAdjacencyList query, MoleculeWithAdjacencyList target) {
         int queryAtomCount = query.size();
         int targetAtomCount = target.size();
@@ -59,111 +152,24 @@ class FunctionGroupCounter {
         return count;
     }
     public static int countAlcohol(MoleculeWithAdjacencyList target){
-        MoleculeWithAdjacencyList ohGroup = new MoleculeWithAdjacencyList();
-        int c = ohGroup.addAtom((byte) 6);
-        int o = ohGroup.addAtom((byte) 8);
-        int h = ohGroup.addAtom((byte) 1);
-        ohGroup.addBond(c, o);
-        ohGroup.addBond(o, h);
-        return countSubgraphs(ohGroup, target);
+        return countSubgraphs(OH_GROUP, target);
     }
     public static int countCarboxylic(MoleculeWithAdjacencyList target){
-        MoleculeWithAdjacencyList coohGroup = new MoleculeWithAdjacencyList();
-        int c = coohGroup.addAtom((byte) 6);
-        int o = coohGroup.addAtom((byte) 8);
-        int o2 = coohGroup.addAtom((byte) 8);
-        int h = coohGroup.addAtom((byte) 1);
-        coohGroup.addBond(c, o2, BondType.DOUBLE);
-        coohGroup.addBond(c, o);
-        coohGroup.addBond(o, h);
-        return countSubgraphs(coohGroup, target);
+        return countSubgraphs(COOH_GROUP, target);
     }
     public static int countAldehyde(MoleculeWithAdjacencyList target){
-        MoleculeWithAdjacencyList aldehydeGroup = new MoleculeWithAdjacencyList();
-        int c = aldehydeGroup.addAtom((byte) 6);
-        int h = aldehydeGroup.addAtom((byte) 1);
-        int o = aldehydeGroup.addAtom((byte) 8);
-        aldehydeGroup.addBond(c, h);
-        aldehydeGroup.addBond(c, o, BondType.DOUBLE);
-        return countSubgraphs(aldehydeGroup, target);
+        return countSubgraphs(ALDEHYDE_GROUP, target);
     }
     public static int countNitrile(MoleculeWithAdjacencyList target){
-        MoleculeWithAdjacencyList nitrileGroup = new MoleculeWithAdjacencyList();
-        int c = nitrileGroup.addAtom((byte) 6);
-        int n = nitrileGroup.addAtom((byte) 7);
-        nitrileGroup.addBond(c, n, BondType.TRIPLE);
-        return countSubgraphs(nitrileGroup, target);
+        return countSubgraphs(NITRILE_GROUP, target);
     }
     public static int countPhenyl(MoleculeWithAdjacencyList target){
-        MoleculeWithAdjacencyList phenyl = new MoleculeWithAdjacencyList();
-        int c1 = phenyl.addAtom((byte) 6);
-        int c2 = phenyl.addAtom((byte) 6);
-        int c3 = phenyl.addAtom((byte) 6);
-        int c4 = phenyl.addAtom((byte) 6);
-        int c5 = phenyl.addAtom((byte) 6);
-        int c6 = phenyl.addAtom((byte) 6);
-        int h7 = phenyl.addAtom((byte) 1);
-        int h8 = phenyl.addAtom((byte) 1);
-        int h9 = phenyl.addAtom((byte) 1);
-        int h10 = phenyl.addAtom((byte) 1);
-        int h11 = phenyl.addAtom((byte) 1);
-        phenyl.addBond(c3, c1, BondType.DOUBLE);
-        phenyl.addBond(c1, c5, BondType.SINGLE);
-        phenyl.addBond(c5, c6, BondType.DOUBLE);
-        phenyl.addBond(c6, c4, BondType.SINGLE);
-        phenyl.addBond(c4, c2, BondType.DOUBLE);
-        phenyl.addBond(c2, c3, BondType.SINGLE);
-        phenyl.addBond(c1, h7, BondType.SINGLE);
-        phenyl.addBond(c2, h8, BondType.SINGLE);
-        phenyl.addBond(c3, h9, BondType.SINGLE);
-        phenyl.addBond(c4, h10, BondType.SINGLE);
-        phenyl.addBond(c5, h11, BondType.SINGLE);
-        return countSubgraphs(phenyl, target);
+        return countSubgraphs(PHENYL_GROUP, target);
     }
     public static int countBenzeneRings(MoleculeWithAdjacencyList target){
-        MoleculeWithAdjacencyList ring = new MoleculeWithAdjacencyList();
-        int c1 = ring.addAtom((byte) 6);
-        int c2 = ring.addAtom((byte) 6);
-        int c3 = ring.addAtom((byte) 6);
-        int c4 = ring.addAtom((byte) 6);
-        int c5 = ring.addAtom((byte) 6);
-        int c6 = ring.addAtom((byte) 6);
-        int h7 = ring.addAtom((byte) 1);
-        int h8 = ring.addAtom((byte) 1);
-        int h9 = ring.addAtom((byte) 1);
-        int h10 = ring.addAtom((byte) 1);
-        int h11 = ring.addAtom((byte) 1);
-        int h12 = ring.addAtom((byte) 1);
-        ring.addBond(c3, c1, BondType.DOUBLE);
-        ring.addBond(c1, c5, BondType.SINGLE);
-        ring.addBond(c5, c6, BondType.DOUBLE);
-        ring.addBond(c6, c4, BondType.SINGLE);
-        ring.addBond(c4, c2, BondType.DOUBLE);
-        ring.addBond(c2, c3, BondType.SINGLE);
-        ring.addBond(c1, h7, BondType.SINGLE);
-        ring.addBond(c2, h8, BondType.SINGLE);
-        ring.addBond(c3, h9, BondType.SINGLE);
-        ring.addBond(c4, h10, BondType.SINGLE);
-        ring.addBond(c5, h11, BondType.SINGLE);
-        ring.addBond(c6, h12, BondType.SINGLE);
-        return countSubgraphs(ring, target);
+        return countSubgraphs(RING, target);
     }
     public static int countAromaticRings(MoleculeWithAdjacencyList target) {
-        MoleculeWithAdjacencyList ring = new MoleculeWithAdjacencyList();
-        int c1 = ring.addAtom((byte) 6);
-        int c2 = ring.addAtom((byte) 6);
-        int c3 = ring.addAtom((byte) 6);
-        int c4 = ring.addAtom((byte) 6);
-        int c5 = ring.addAtom((byte) 6);
-        int c6 = ring.addAtom((byte) 6);
-
-        ring.addBond(c1, c2, BondType.AROMATIC);
-        ring.addBond(c2, c3, BondType.AROMATIC);
-        ring.addBond(c3, c4, BondType.AROMATIC);
-        ring.addBond(c4, c5, BondType.AROMATIC);
-        ring.addBond(c5, c6, BondType.AROMATIC);
-        ring.addBond(c6, c1, BondType.AROMATIC);
-
-        return countSubgraphs(ring, target);
+        return countSubgraphs(AROMATIC_RING, target);
     }
 }
