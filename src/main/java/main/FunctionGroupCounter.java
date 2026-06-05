@@ -3,6 +3,8 @@ package main;
 import main.VF2.MoleculeWithAdjacencyList;
 
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 
 import static main.Parser.isFeasible;
@@ -160,7 +162,9 @@ class FunctionGroupCounter {
                  targetCandidate++) {
                 nextCandidate[queryDepth] = targetCandidate + 1;
                 if (targetToQuery[targetCandidate] != -1) continue;
-                if (query.getAtom(queryDepth) != target.getAtom(targetCandidate)) continue;
+                int queryAtom = query.getAtom(queryDepth);
+                int targetAtom = target.getAtom(targetCandidate);
+                if (queryAtom != 0 && queryAtom != targetAtom) continue;
                 if (!isFeasible(query, target, queryToTarget, queryDepth, targetCandidate)) continue;
                 queryToTarget[queryDepth] = targetCandidate;
                 targetToQuery[targetCandidate] = queryDepth;

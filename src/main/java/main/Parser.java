@@ -2,10 +2,7 @@ package main;
 
 import main.VF2.MoleculeWithAdjacencyList;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Parser {
     Map<Integer, Integer> storage = new HashMap<>();
@@ -206,6 +203,9 @@ public class Parser {
         }
 
         public static int numberInPTable(String s) {
+            if(Objects.equals(s, "A")){
+                return 0;
+            }
             Integer e = PT_MAP.get(s);// O(1)
             if (e == null)
                 throw new IllegalArgumentException("No such chemical element: " + s);

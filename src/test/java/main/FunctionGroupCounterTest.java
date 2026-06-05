@@ -9,6 +9,128 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FunctionGroupCounterTest {
     @Test
+    void countSubgraphs_noMatch() {
+        MoleculeWithAdjacencyList target = new MoleculeWithAdjacencyList();
+        int c = target.addAtom((byte) 6);
+
+        MoleculeWithAdjacencyList query = new MoleculeWithAdjacencyList();
+        int o = query.addAtom((byte) 8);
+
+        assertEquals(0, FunctionGroupCounter.countSubgraphs(query, target));
+    }
+    @Test
+    void countSubgraphs_twoOxygenAtoms() {
+        MoleculeWithAdjacencyList target = new MoleculeWithAdjacencyList();
+        target.addAtom((byte) 8);
+        target.addAtom((byte) 8);
+
+        MoleculeWithAdjacencyList query = new MoleculeWithAdjacencyList();
+        query.addAtom((byte) 8);
+
+        assertEquals(2, FunctionGroupCounter.countSubgraphs(query, target));
+    }
+    @Test
+    void countSubgraphs_anyAtomMatchesCarbon() {
+        MoleculeWithAdjacencyList target = new MoleculeWithAdjacencyList();
+        target.addAtom((byte) 6);
+
+        MoleculeWithAdjacencyList query = new MoleculeWithAdjacencyList();
+        query.addAtom((byte) 0);
+
+        assertEquals(1, FunctionGroupCounter.countSubgraphs(query, target));
+    }
+    @Test
+    void countSubgraphs_anyAtomMatchesAllAtoms() {
+        MoleculeWithAdjacencyList target = new MoleculeWithAdjacencyList();
+        target.addAtom((byte) 6);
+        target.addAtom((byte) 8);
+        target.addAtom((byte) 1);
+
+        MoleculeWithAdjacencyList query = new MoleculeWithAdjacencyList();
+        query.addAtom((byte) 0);
+
+        assertEquals(3, FunctionGroupCounter.countSubgraphs(query, target));
+    }
+    @Test
+    void countSubgraphs_anyAtomInBond() {
+        MoleculeWithAdjacencyList target = new MoleculeWithAdjacencyList();
+        int c = target.addAtom((byte) 6);
+        int o = target.addAtom((byte) 8);
+        target.addBond(c, o);
+
+        MoleculeWithAdjacencyList query = new MoleculeWithAdjacencyList();
+        int any = query.addAtom((byte) 0);
+        int oxygen = query.addAtom((byte) 8);
+        query.addBond(any, oxygen);
+
+        assertEquals(1, FunctionGroupCounter.countSubgraphs(query, target));
+    }
+    @Test
+    void countSubgraphs_anyAtomButNoBond() {
+        MoleculeWithAdjacencyList target = new MoleculeWithAdjacencyList();
+        target.addAtom((byte) 6);
+        target.addAtom((byte) 8);
+
+        MoleculeWithAdjacencyList query = new MoleculeWithAdjacencyList();
+        int a = query.addAtom((byte) 0);
+        int o = query.addAtom((byte) 8);
+        query.addBond(a, o);
+
+        assertEquals(0, FunctionGroupCounter.countSubgraphs(query, target));
+    }
+    @Test
+    void countSubgraphs_twoOHGroups() {
+        MoleculeWithAdjacencyList target = new MoleculeWithAdjacencyList();
+
+        int o1 = target.addAtom((byte) 8);
+        int h1 = target.addAtom((byte) 1);
+        int o2 = target.addAtom((byte) 8);
+        int h2 = target.addAtom((byte) 1);
+
+        target.addBond(o1, h1);
+        target.addBond(o2, h2);
+
+        MoleculeWithAdjacencyList query = new MoleculeWithAdjacencyList();
+        int o = query.addAtom((byte) 8);
+        int h = query.addAtom((byte) 1);
+        query.addBond(o, h);
+
+        assertEquals(2, FunctionGroupCounter.countSubgraphs(query, target));
+    }
+    @Test
+    void countSubgraphs_moleculeMatchesItself() {
+        MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
+
+        int c = m.addAtom((byte) 6);
+        int o = m.addAtom((byte) 8);
+        int h = m.addAtom((byte) 1);
+
+        m.addBond(c, o);
+        m.addBond(o, h);
+
+        assertEquals(1, FunctionGroupCounter.countSubgraphs(m, m));
+    }
+    @Test
+    void countSubgraphs_queryLargerThanTarget() {
+        MoleculeWithAdjacencyList target = new MoleculeWithAdjacencyList();
+        target.addAtom((byte) 6);
+
+        MoleculeWithAdjacencyList query = new MoleculeWithAdjacencyList();
+        query.addAtom((byte) 6);
+        query.addAtom((byte) 6);
+
+        assertEquals(0, FunctionGroupCounter.countSubgraphs(query, target));
+    }
+    @Test
+    void countSubgraphs_emptyQuery() {
+        MoleculeWithAdjacencyList target = new MoleculeWithAdjacencyList();
+        target.addAtom((byte) 6);
+
+        MoleculeWithAdjacencyList query = new MoleculeWithAdjacencyList();
+
+        assertEquals(1, FunctionGroupCounter.countSubgraphs(query, target));
+    }
+    @Test
     void countAlcohol_singleOH() {
         MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
         MoleculeWithAdjacencyList ohGroup = new MoleculeWithAdjacencyList();
