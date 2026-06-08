@@ -114,7 +114,16 @@ class FunctionGroupCounter {
     }
     public static int countSubgraphs(MoleculeWithAdjacencyList query, MoleculeWithAdjacencyList target) {
         int queryAtomCount = query.size();
+        if(queryAtomCount==0){
+            throw new IllegalArgumentException("Query is empty");
+        }
         int targetAtomCount = target.size();
+        if(targetAtomCount==0){
+            throw new IllegalArgumentException("Target is empty");
+        }
+        if(queryAtomCount>targetAtomCount){
+            throw new  IllegalArgumentException("Query is bigger than target, query size: " + queryAtomCount + ", target size: " + targetAtomCount);
+        }
         int[] queryToTarget = new int[queryAtomCount];
         int[] targetToQuery = new int[targetAtomCount];
         int[] nextCandidate = new int[queryAtomCount];
