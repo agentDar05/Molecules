@@ -130,7 +130,7 @@ public class Parser {
 
     static class Utils {
         final static String[] SYMBOLS = new String[]{
-                "H", "He",
+                "A", "H", "He",
                 "Li", "Be", "B", "C", "N", "O", "F", "Ne",
                 "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar",
                 "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn",
@@ -203,9 +203,6 @@ public class Parser {
         }
 
         public static int numberInPTable(String s) {
-            if(Objects.equals(s, "A")){
-                return 0;
-            }
             Integer e = PT_MAP.get(s);// O(1)
             if (e == null)
                 throw new IllegalArgumentException("No such chemical element: " + s);
