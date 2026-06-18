@@ -19,6 +19,19 @@ class FunctionGroupCounter {
     public static MoleculeWithAdjacencyList AROMATIC_RING;
     public static MoleculeWithAdjacencyList KETO_TAUTOMER;
     public static MoleculeWithAdjacencyList ENOL_TAUTOMER;
+    /***
+     * Alcohol,
+     * Carboxylic,
+     * Aldehyde,
+     * Nitrile,
+     * Phenyl,
+     * Ring,
+     * Aromatic ring,
+     * Keto tautomer,
+     * Enol tautomer
+     */
+
+    public static boolean[] functionGroups = new boolean[8];
 
     static{
         {
@@ -76,7 +89,7 @@ class FunctionGroupCounter {
                     .getClassLoader()
                     .getResourceAsStream("ring.mol");
             try {
-                OH_GROUP = (MoleculeWithAdjacencyList) MolV3000.read(is_ring);
+                RING = (MoleculeWithAdjacencyList) MolV3000.read(is_ring);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -86,7 +99,7 @@ class FunctionGroupCounter {
                     .getClassLoader()
                     .getResourceAsStream("aromatic_ring.mol");
             try {
-                OH_GROUP = (MoleculeWithAdjacencyList) MolV3000.read(is_arom_ring);
+                AROMATIC_RING = (MoleculeWithAdjacencyList) MolV3000.read(is_arom_ring);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -96,7 +109,7 @@ class FunctionGroupCounter {
                     .getClassLoader()
                     .getResourceAsStream("keto_tautomer.mol");
             try {
-                OH_GROUP = (MoleculeWithAdjacencyList) MolV3000.read(is_keto);
+                KETO_TAUTOMER = (MoleculeWithAdjacencyList) MolV3000.read(is_keto);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -106,11 +119,31 @@ class FunctionGroupCounter {
                     .getClassLoader()
                     .getResourceAsStream("enol_tautomer.mol");
             try {
-                OH_GROUP = (MoleculeWithAdjacencyList) MolV3000.read(is_enol);
+                ENOL_TAUTOMER = (MoleculeWithAdjacencyList) MolV3000.read(is_enol);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
+    }
+    public static boolean[] countFunctionGroups (MoleculeWithAdjacencyList target){
+        Arrays.fill(functionGroups, false);
+        functionGroups[0] = countAlcohol(target) >=1;
+        functionGroups[1] = countCarboxylic(target) >=1;
+        functionGroups[2] = countAldehyde(target) >=1;
+        functionGroups[3] = countNitrile(target) >=1;
+        functionGroups[4] = countPhenyl(target) >=1;
+        functionGroups[5] = countBenzeneRings(target) >=1;
+        functionGroups[6] = countAromaticRings(target) >=1;
+        if (countKeto(target) >=1){
+            functionGroups[7] = true;
+            functionGroups[8] = true;
+        }
+        if (countEnol(target) >=1){
+            functionGroups[7] = true;
+            functionGroups[8] = true;
+        }
+
+        return functionGroups;
     }
     public static int countSubgraphs(MoleculeWithAdjacencyList query, MoleculeWithAdjacencyList target) {
         int queryAtomCount = query.size();
@@ -191,8 +224,14 @@ class FunctionGroupCounter {
     public static int countBenzeneRings(MoleculeWithAdjacencyList target){
         return countSubgraphs(RING, target);
     }
-    public static int countAromaticRings(MoleculeWithAdjacencyList target) {return countSubgraphs(AROMATIC_RING, target);}
-    public static int countKeto(MoleculeWithAdjacencyList target) {return countSubgraphs(KETO_TAUTOMER, target);}
-    public static int countEnol(MoleculeWithAdjacencyList target) {return countSubgraphs(ENOL_TAUTOMER, target);}
+    public static int countAromaticRings(MoleculeWithAdjacencyList target) {
+        return countSubgraphs(AROMATIC_RING, target);
+    }
+    public static int countKeto(MoleculeWithAdjacencyList target) {
+        return countSubgraphs(KETO_TAUTOMER, target);
+    }
+    public static int countEnol(MoleculeWithAdjacencyList target) {
+        return countSubgraphs(ENOL_TAUTOMER, target);
+    }
 
 }

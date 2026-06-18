@@ -47,7 +47,6 @@ public class MolV3000 {
         sb.append("M  END");
         os.write(sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
-
     /**
      * Reads MolV3000 file and transforms it in Molecule, storing atoms, bonds and bond types
      *
@@ -55,7 +54,6 @@ public class MolV3000 {
      * @return Molecule
      *
      */
-
     public static Molecule read(InputStream is) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
         MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
@@ -85,7 +83,6 @@ public class MolV3000 {
         return m;
 
     }
-
     /**
      * Counts bonds in given Molecule
      *
@@ -102,7 +99,6 @@ public class MolV3000 {
         }
         return count;
     }
-
     /**
      * Parses atom block, adds atoms into a given molecule
      *
@@ -121,7 +117,6 @@ public class MolV3000 {
         }
         throw new IllegalArgumentException("Missing 'M  V30 END ATOM' block");
     }
-
     /**
      * Parses bond block, adds bonds into a given molecule
      *
@@ -145,7 +140,6 @@ public class MolV3000 {
         }
         throw new IllegalArgumentException("Missing 'M  V30 END ATOM' block");
     }
-
     /**
      * The method divides line into separate blocks and finds atom index
      *
@@ -165,7 +159,6 @@ public class MolV3000 {
         String element = line.substring(space3 + 1, space4);
         return Parser.Utils.numberInPTable(element);
     }
-
     /**
      * Parses a bond line and extracts three integers:
      * the indices of two atoms and the bond type.
