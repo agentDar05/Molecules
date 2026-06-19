@@ -12,6 +12,7 @@ import static main.Parser.isFeasible;
 class FunctionGroupCounter {
     public static MoleculeWithAdjacencyList OH_GROUP;
     public static MoleculeWithAdjacencyList COOH_GROUP;
+    public static MoleculeWithAdjacencyList FORMIC_ACID;
     public static MoleculeWithAdjacencyList ALDEHYDE_GROUP;
     public static MoleculeWithAdjacencyList NITRILE_GROUP;
     public static MoleculeWithAdjacencyList PHENYL_GROUP;
@@ -50,6 +51,16 @@ class FunctionGroupCounter {
                     .getResourceAsStream("cooh_group.mol");
             try {
                 COOH_GROUP = (MoleculeWithAdjacencyList) MolV3000.read(is_cooh);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        {
+            InputStream is_formic_acid = FunctionGroupCounter.class
+                    .getClassLoader()
+                    .getResourceAsStream("formic_acid.mol");
+            try {
+                FORMIC_ACID = (MoleculeWithAdjacencyList) MolV3000.read(is_formic_acid);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -210,6 +221,9 @@ class FunctionGroupCounter {
         return countSubgraphs(OH_GROUP, target);
     }
     public static int countCarboxylic(MoleculeWithAdjacencyList target){
+        if(countSubgraphs(FORMIC_ACID, target) > 0){
+            return 0;
+        }
         return countSubgraphs(COOH_GROUP, target);
     }
     public static int countAldehyde(MoleculeWithAdjacencyList target){
