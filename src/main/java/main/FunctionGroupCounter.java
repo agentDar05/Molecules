@@ -136,7 +136,7 @@ class FunctionGroupCounter {
             }
         }
     }
-    public static boolean[] countFunctionGroups (MoleculeWithAdjacencyList target){
+    public static boolean[] findFunctionGroups (MoleculeWithAdjacencyList target){
         Arrays.fill(functionGroups, false);
         functionGroups[0] = countAlcohol(target) >=1;
         functionGroups[1] = countCarboxylic(target) >=1;

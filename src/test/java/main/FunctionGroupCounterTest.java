@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class FunctionGroupCounterTest {
     @Test
     void countsFunctionalGroups(){
-        FunctionGroupCounter.countFunctionGroups(FunctionGroupCounter.OH_GROUP);
+        FunctionGroupCounter.findFunctionGroups(FunctionGroupCounter.OH_GROUP);
     }
     @Test
     void countSubgraphs_noMatch() {
