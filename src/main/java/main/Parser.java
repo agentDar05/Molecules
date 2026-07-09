@@ -325,6 +325,14 @@ public class Parser {
 //        cooh.addBond(2, 0, BondType.SINGLE);
 //        return isSubgraph(cooh, m);
 //    }
+    public static void compareMolecules(MoleculeWithAdjacencyList mol1, MoleculeWithAdjacencyList mol2) {
+        if (!Parser.isSubgraph(mol1, mol2)){
+            throw new RuntimeException("Subgraphs are not equal");
+        };
+        if (!Parser.isSubgraph(mol2, mol1)){
+            throw new RuntimeException("Subgraphs are not equal");
+        };
+    }
     public static boolean isSubgraph(MoleculeWithAdjacencyList query, MoleculeWithAdjacencyList target) {
 
         int queryAtomCount = query.size();
