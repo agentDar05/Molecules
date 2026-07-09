@@ -2,49 +2,54 @@ package main;
 
 import main.VF2.MoleculeWithAdjacencyList;
 
+import java.util.Stack;
+
 public class SmilesParser {
-    public static String read(String s) {
-        int start = 0;
-        int end = 0;
+    public static MoleculeWithAdjacencyList read(String s) {
         byte currBondType = 1;
         int atomCount = 0;
+        int currentAtom = -1;
+        Stack<Integer> branches = new Stack<>();
         MoleculeWithAdjacencyList molecule = new MoleculeWithAdjacencyList();
-        for (int i = 0; i < s.length(); i++, end++) {
+        for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             if (c == '-') {
-                end--;
                 currBondType = 1;
                 continue;
             }
             if (c == '=') {
-                end--;
                 currBondType = 2;
                 continue;
             }
             if (c == '#') {
-                end--;
                 currBondType = 3;
                 continue;
             }
+            if (c == '(') {
+                branches.push(currentAtom);
+                continue;
+            }
+            if (c == ')') {
+                currentAtom = branches.pop();
+                continue;
+            }
             if (c >= 'A' && c <= 'Z') {
-                String atom = s.substring(start, end);
-                if (!atom.isEmpty()) {
-                    molecule.addAtom((byte) Parser.Utils.numberInPTable(atom));
-                    atomCount++;
-                    if (atomCount > 1) {
-                        molecule.addBond(atomCount - 2, atomCount - 1, currBondType);
-                    }
-                    currBondType = 1;
+                String atom;
+                if (i + 1 < s.length() && s.charAt(i + 1) >= 'a' && s.charAt(i + 1) <= 'z') {
+                    atom = s.substring(i, i + 2);
+                    i++;
+                } else {
+                    atom = String.valueOf(c);
                 }
-                start = i;
+                molecule.addAtom((byte) Parser.Utils.numberInPTable(atom));
+                if (currentAtom != -1) {
+                    molecule.addBond(currentAtom, atomCount, currBondType);
+                }
+                currentAtom = atomCount;
+                atomCount++;
+                currBondType = 1;
             }
         }
-        String atom = s.substring(start);
-        molecule.addAtom((byte) Parser.Utils.numberInPTable(atom));
-        atomCount++;
-        if (atomCount > 1) {
-            molecule.addBond(atomCount - 2, atomCount - 1, currBondType);
-        }
-        return molecule.getAtoms().toString();
+        return molecule;
     }
 }
