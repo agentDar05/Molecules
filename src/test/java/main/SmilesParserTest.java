@@ -72,5 +72,20 @@ public class SmilesParserTest {
         m.addBond(4, 5, BondType.SINGLE);
         Parser.compareMolecules(SmilesParser.read("C(C)CCCC"), m);
     }
-
+    @Test
+    void parseAromaticStructure(){
+        MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
+        m.addAtom(C); // 0
+        m.addAtom(C); // 1
+        m.addAtom(C); // 2
+        m.addAtom(C); // 3
+        m.addAtom(C); // 4
+        m.addAtom(C); // 5
+        m.addBond(0, 1, BondType.AROMATIC);
+        m.addBond(0, 2, BondType.AROMATIC);
+        m.addBond(2, 3, BondType.AROMATIC);
+        m.addBond(3, 4, BondType.AROMATIC);
+        m.addBond(4, 5, BondType.AROMATIC);
+        Parser.compareMolecules(SmilesParser.read("cccccc"), m);
+    }
 }

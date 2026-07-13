@@ -33,18 +33,27 @@ public class SmilesParser {
                 currentAtom = branches.pop();
                 continue;
             }
-            if (c >= 'A' && c <= 'Z') {
+            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
                 String atom;
-                if (i + 1 < s.length() && s.charAt(i + 1) >= 'a' && s.charAt(i + 1) <= 'z') {
-                    atom = s.substring(i, i + 2);
-                    i++;
+                boolean aromatic = false;
+                if (c >= 'a' && c <= 'z') {
+                    aromatic = true;
+                    atom = String.valueOf(c).toUpperCase();
                 } else {
-                    atom = String.valueOf(c);
+                    if (i + 1 < s.length() && s.charAt(i + 1) >= 'a' && s.charAt(i + 1) <= 'z') {
+                        atom = s.substring(i, i + 2);
+                        i++;
+                    } else {
+                        atom = String.valueOf(c);
+                    }
                 }
                 molecule.addAtom((byte) Parser.Utils.numberInPTable(atom));
                 if (currentAtom != -1) {
-                    molecule.addBond(currentAtom, atomCount, currBondType);
-                }
+                    byte bondType = currBondType;
+                    if (aromatic) {
+                        bondType = 4;
+                    }
+                    molecule.addBond(currentAtom, atomCount, bondType);                }
                 currentAtom = atomCount;
                 atomCount++;
                 currBondType = 1;
