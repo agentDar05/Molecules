@@ -1,5 +1,6 @@
 package main.VF2;
 
+import main.Atom;
 import main.BondType;
 import main.Bytes;
 import main.Molecule;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 public class MoleculeWithAdjacencyList implements Molecule {
 
     Bytes atoms = new Bytes();
+    ArrayList<Atom> atomArray = new ArrayList<>();
     public ArrayList<ArrayList<Integer>> bonds = new ArrayList<>();
     public byte[][] bondTypes = new byte[50][50];
     public Bytes getAtoms() {
@@ -21,9 +23,19 @@ public class MoleculeWithAdjacencyList implements Molecule {
         return bonds;
     }
     public int addAtom(byte atomType) {
+        atomArray.add(new Atom(atomType));
         atoms.add(atomType);
         bonds.add(new ArrayList<>());
         return atoms.size()-1;
+    }
+    public int addAtom(byte atomType, byte atomCharge) {
+        atomArray.add(new Atom(atomType));
+        atoms.add(atomType);
+        bonds.add(new ArrayList<>());
+        return atoms.size()-1;
+    }
+    public void setAtomCharge(int idx, byte atomCharge){
+        atomArray.get(idx).setCharge(atomCharge);
     }
     public ArrayList<Integer> getBonds(int atom) {return bonds.get(atom);}
     public void addBond(int i, int j) {
@@ -33,10 +45,18 @@ public class MoleculeWithAdjacencyList implements Molecule {
     public void addBond(int i, int j, byte type) {
         bonds.get(i).add(j);
         bonds.get(j).add(i);
+        makeAromatic(i);
+        makeAromatic(j);
         bondTypes[i][j] = type;
         bondTypes[j][i] = type;
     }
 
+    public void makeAromatic(int idx){
+        atomArray.get(idx).makeAromantic();
+    }
+    public void isAromatic(int idx){
+        atomArray.get(idx).isAromatic();
+    }
     public int size() {
         return atoms.size();
     }

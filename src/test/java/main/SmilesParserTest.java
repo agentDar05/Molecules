@@ -4,7 +4,9 @@ import main.VF2.MoleculeWithAdjacencyList;
 import org.junit.jupiter.api.Test;
 
 public class SmilesParserTest {
+    private static final byte H = 1;
     private static final byte C = 6;
+    private static final byte N = 7;
     private static final byte Cl = 17;
     private static final byte Br = 18;
 
@@ -87,5 +89,20 @@ public class SmilesParserTest {
         m.addBond(3, 4, BondType.AROMATIC);
         m.addBond(4, 5, BondType.AROMATIC);
         Parser.compareMolecules(SmilesParser.read("cccccc"), m);
+    }
+    @Test
+    void parseBracketStructure(){
+        MoleculeWithAdjacencyList m = new MoleculeWithAdjacencyList();
+        m.addAtom(N); // 0
+        m.addAtom(H); // 1
+        m.addAtom(H); // 2
+        m.addAtom(H); // 3
+        m.addAtom(H); // 4
+        m.setAtomCharge(0, (byte) 1);
+        m.addBond(0, 1);
+        m.addBond(0, 2);
+        m.addBond(0, 3);
+        m.addBond(0, 4);
+        Parser.compareMolecules(SmilesParser.read("[N+]([H])([H])([H])[H]"), m);
     }
 }
