@@ -20,6 +20,14 @@ class FunctionGroupCounter {
     public static MoleculeWithAdjacencyList AROMATIC_RING;
     public static MoleculeWithAdjacencyList KETO_TAUTOMER;
     public static MoleculeWithAdjacencyList ENOL_TAUTOMER;
+    public static MoleculeWithAdjacencyList PRIMARY_AMINE;
+    public static MoleculeWithAdjacencyList SECONDARY_AMINE;
+    public static MoleculeWithAdjacencyList TERTIARY_AMINE;
+    public static MoleculeWithAdjacencyList PRIMARY_AROMATIC_AMINE;
+    public static MoleculeWithAdjacencyList SECONDARY_AROMATIC_AMINE;
+    public static MoleculeWithAdjacencyList TERTIARY_AROMATIC_AMINE;
+
+
     /***
      * Alcohol,
      * Carboxylic,
@@ -29,7 +37,10 @@ class FunctionGroupCounter {
      * Ring,
      * Aromatic ring,
      * Keto tautomer,
-     * Enol tautomer
+     * Enol tautomer,
+     * Primary amine,
+     * Secondary amine,
+     * Tertiary amine
      */
 
     public static boolean[] functionGroups = new boolean[8];
@@ -131,6 +142,66 @@ class FunctionGroupCounter {
                     .getResourceAsStream("enol_tautomer.mol");
             try {
                 ENOL_TAUTOMER = (MoleculeWithAdjacencyList) MolV3000.read(is_enol);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        {
+            InputStream is_primary = FunctionGroupCounter.class
+                    .getClassLoader()
+                    .getResourceAsStream("primary_amine.mol");
+            try {
+                PRIMARY_AMINE = (MoleculeWithAdjacencyList) MolV3000.read(is_primary);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        {
+            InputStream is_secondary = FunctionGroupCounter.class
+                    .getClassLoader()
+                    .getResourceAsStream("secondary_amine.mol");
+            try {
+                SECONDARY_AMINE = (MoleculeWithAdjacencyList) MolV3000.read(is_secondary);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        {
+            InputStream is_tertiary = FunctionGroupCounter.class
+                    .getClassLoader()
+                    .getResourceAsStream("tertiary_amine.mol");
+            try {
+                TERTIARY_AMINE = (MoleculeWithAdjacencyList) MolV3000.read(is_tertiary);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        {
+            InputStream is_arom_primary = FunctionGroupCounter.class
+                    .getClassLoader()
+                    .getResourceAsStream("primary_aromatic_amine.mol");
+            try {
+                PRIMARY_AROMATIC_AMINE = (MoleculeWithAdjacencyList) MolV3000.read(is_arom_primary);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        {
+            InputStream is_arom_secondary = FunctionGroupCounter.class
+                    .getClassLoader()
+                    .getResourceAsStream("secondary_aromatic_amine.mol");
+            try {
+                SECONDARY_AROMATIC_AMINE = (MoleculeWithAdjacencyList) MolV3000.read(is_arom_secondary);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        {
+            InputStream is_arom_tertiary = FunctionGroupCounter.class
+                    .getClassLoader()
+                    .getResourceAsStream("tertiary_aromatic_amine.mol");
+            try {
+                TERTIARY_AROMATIC_AMINE = (MoleculeWithAdjacencyList) MolV3000.read(is_arom_tertiary);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -247,5 +318,24 @@ class FunctionGroupCounter {
     public static int countEnol(MoleculeWithAdjacencyList target) {
         return countSubgraphs(ENOL_TAUTOMER, target);
     }
+
+    public static boolean isPrimaryAmine(MoleculeWithAdjacencyList target) {
+        return countSubgraphs(PRIMARY_AMINE, target) > 0;
+    }
+    public static boolean isSecondaryAmine(MoleculeWithAdjacencyList target) {
+        return countSubgraphs(SECONDARY_AMINE, target) > 0;
+    }
+    public static boolean isTertiaryAmine(MoleculeWithAdjacencyList target) {
+        return countSubgraphs(TERTIARY_AMINE, target) > 0;
+    }
+    public static boolean isPrimaryAromaticAmine(MoleculeWithAdjacencyList target){
+        return countSubgraphs(PRIMARY_AROMATIC_AMINE, target) > 0;
+    };
+    public static boolean isSecondaryAromaticAmine(MoleculeWithAdjacencyList target){
+        return countSubgraphs(SECONDARY_AROMATIC_AMINE, target) > 0;
+    };
+    public static boolean isTertiaryAromaticAmine(MoleculeWithAdjacencyList target){
+        return countSubgraphs(TERTIARY_AROMATIC_AMINE, target) > 0;
+    };
 
 }

@@ -21,4 +21,12 @@ public class Bytes {
     public int size() {
         return size;
     }
+    public String toString(){
+        String s = "[";
+        for (int i = 0; i < size; i++){
+            s += data[i] + ", ";
+        }
+        s+="]";
+        return s;
+    }
 }

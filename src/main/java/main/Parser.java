@@ -202,14 +202,20 @@ public class Parser {
             return PT_MAP.containsKey(s); // O(1)
         }
 
+        public static String bytesToString(byte[] bytes){
+            String s = "[";
+            for (int i = 0; i < bytes.length; i++){
+                s += bytes[i] + ", ";
+            }
+            s+="]";
+            return s;
+        }
         public static int numberInPTable(String s) {
             Integer e = PT_MAP.get(s);// O(1)
             if (e == null)
                 throw new IllegalArgumentException("No such chemical element: " + s);
             return e;
-
         }
-
         public static double calculateMW(Map<Integer, Integer> elementsInMap) {
             double mw = 0.0;
             for (Map.Entry<Integer, Integer> element : elementsInMap.entrySet()) {
@@ -338,6 +344,9 @@ public class Parser {
         int queryAtomCount = query.size();
         int targetAtomCount = target.size();
 
+        if (query.isChiral() != target.isChiral()) return false;
+        if (query.isChiralClockwise() != target.isChiralClockwise()) return false;
+
         int[] queryToTarget = new int[queryAtomCount];
         int[] targetToQuery = new int[targetAtomCount];
         int[] nextCandidate = new int[queryAtomCount];
@@ -378,7 +387,6 @@ public class Parser {
     }
 
     static boolean isFeasible(MoleculeWithAdjacencyList query, MoleculeWithAdjacencyList target, int[] queryToTarget, int queryAtom, int targetAtom) {
-
         ArrayList<Integer> targetNeighbors = target.bonds.get(targetAtom);
 
         for (int otherQueryAtom : query.bonds.get(queryAtom)) {
