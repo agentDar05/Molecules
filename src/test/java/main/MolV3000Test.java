@@ -92,4 +92,17 @@ public class MolV3000Test {
         java.nio.file.Files.lines(java.nio.file.Path.of("output.mol"))
                 .forEach(System.out::println);
     }
+    @Test
+    void parsesCharge() throws IOException {
+        InputStream is = MoleculesParserBenchmark.class
+                .getClassLoader()
+                .getResourceAsStream("nh2.mol");
+        MoleculeWithAdjacencyList output = (MoleculeWithAdjacencyList) MolV3000.read(is);
+        System.out.println(Parser.Utils.bytesToString(output.getCharges()));
+    }
+    @Test
+    void ignoresCollection() throws IOException {
+        InputStream is = MolV3000Test.class.getClassLoader().getResourceAsStream("h2so4.mol");
+        MolV3000.read(is);
+    }
 }

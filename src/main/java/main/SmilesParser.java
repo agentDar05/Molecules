@@ -118,18 +118,8 @@ public class SmilesParser {
         }
         return molecule;
     }
-    private static int addAtom(
-            MoleculeWithAdjacencyList molecule,
-            String atom,
-            int currentAtom,
-            int atomCount,
-            byte bondType,
-            byte charge
-    ) {
-        molecule.addAtom(
-                (byte) Parser.Utils.numberInPTable(atom),
-                charge
-        );
+    private static int addAtom(MoleculeWithAdjacencyList molecule, String atom, int currentAtom, int atomCount, byte bondType, byte charge) {
+        molecule.addAtom((byte) Parser.Utils.numberInPTable(atom), charge);
         if (currentAtom != -1) {
             molecule.addBond(
                     currentAtom,
@@ -150,6 +140,7 @@ public class SmilesParser {
     ) {
         String atom = "";
         byte charge = 0;
+        boolean isChiral = false;
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             if (Character.isLetter(c)) {
@@ -172,14 +163,16 @@ public class SmilesParser {
             if (c == '-') {
                 charge--;
             }
+            if (c=='@' && !isChiral){
+                isChiral = true;
+                if (s.length() > i + 1 && s.charAt(i + 1) == '@'){
+                    molecule.setChiral(true);
+                }
+                else{
+                    molecule.setChiral(false);
+                }
+            }
         }
-        return addAtom(
-                molecule,
-                atom,
-                currentAtom,
-                atomCount,
-                bondType,
-                charge
-        );
+        return addAtom(molecule, atom, currentAtom, atomCount, bondType, charge);
     }
 }

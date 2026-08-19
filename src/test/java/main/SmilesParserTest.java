@@ -3,6 +3,8 @@ package main;
 import main.VF2.MoleculeWithAdjacencyList;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class SmilesParserTest {
     private static final byte H = 1;
     private static final byte C = 6;
@@ -104,5 +106,11 @@ public class SmilesParserTest {
         m.addBond(0, 3);
         m.addBond(0, 4);
         Parser.compareMolecules(SmilesParser.read("[N+]([H])([H])([H])[H]"), m);
+    }
+    @Test
+    void parseChirality(){
+        MoleculeWithAdjacencyList mc = SmilesParser.read("[S@](O)(O)(=O)=O");
+        MoleculeWithAdjacencyList mac = SmilesParser.read("[S@@](O)(O)(=O)=O");
+        assertThrows(RuntimeException.class, ()-> Parser.compareMolecules(mc, mac));
     }
 }
