@@ -6,6 +6,8 @@ import main.VF2.MoleculeWithAdjacencyList;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static main.Parser.isFeasible;
 
@@ -245,11 +247,27 @@ class FunctionGroupCounter {
         Arrays.fill(queryToTarget, -1);
         Arrays.fill(targetToQuery, -1);
         Arrays.fill(nextCandidate, 0);
+        Set<Integer> usedAtoms = new HashSet<>();
+        Set<String> foundMappings = new HashSet<>();
         int queryDepth = 0;
         int count = 0;
         while (queryDepth >= 0) {
             if (queryDepth == queryAtomCount) {
-                count++;
+                int[] mapping = queryToTarget.clone();
+                boolean used = false;
+                for (int atom : mapping) {
+                    if (usedAtoms.contains(atom)) {
+                        used = true;
+                        break;
+                    }
+                }
+                if (!used) {
+                    for (int atom : mapping) {usedAtoms.add(atom);}
+                    Arrays.sort(mapping);
+                    String mappingKey = Arrays.toString(mapping);
+                    if (foundMappings.add(mappingKey))
+                        count++;
+                }
                 queryDepth--;
                 if (queryDepth >= 0) {
                     int mapped = queryToTarget[queryDepth];
@@ -289,7 +307,7 @@ class FunctionGroupCounter {
         return count;
     }
     public static int countAlcohol(MoleculeWithAdjacencyList target){
-        return countSubgraphs(OH_GROUP, target);
+        return countSubgraphs(target, OH_GROUP);
     }
     public static int countCarboxylic(MoleculeWithAdjacencyList target){
         if(countSubgraphs(OXALIC_ACID, target) > 0){
@@ -298,44 +316,49 @@ class FunctionGroupCounter {
         return countSubgraphs(COOH_GROUP, target);
     }
     public static int countAldehyde(MoleculeWithAdjacencyList target){
-        return countSubgraphs(ALDEHYDE_GROUP, target);
+        return countSubgraphs(target, ALDEHYDE_GROUP);
     }
     public static int countNitrile(MoleculeWithAdjacencyList target){
-        return countSubgraphs(NITRILE_GROUP, target);
+        return countSubgraphs(target, NITRILE_GROUP);
     }
     public static int countPhenyl(MoleculeWithAdjacencyList target){
-        return countSubgraphs(PHENYL_GROUP, target);
+        return countSubgraphs(target, PHENYL_GROUP);
     }
     public static int countBenzeneRings(MoleculeWithAdjacencyList target){
-        return countSubgraphs(RING, target);
+        return countSubgraphs(target, RING);
     }
     public static int countAromaticRings(MoleculeWithAdjacencyList target) {
-        return countSubgraphs(AROMATIC_RING, target);
+        return countSubgraphs(target, AROMATIC_RING);
     }
     public static int countKeto(MoleculeWithAdjacencyList target) {
-        return countSubgraphs(KETO_TAUTOMER, target);
+        return countSubgraphs(target, KETO_TAUTOMER);
     }
     public static int countEnol(MoleculeWithAdjacencyList target) {
-        return countSubgraphs(ENOL_TAUTOMER, target);
+        return countSubgraphs(target, ENOL_TAUTOMER);
     }
 
-    public static boolean isPrimaryAmine(MoleculeWithAdjacencyList target) {
-        return countSubgraphs(PRIMARY_AMINE, target) > 0;
+    public static int isPrimaryAmine(MoleculeWithAdjacencyList target) {
+        return countSubgraphs(target, PRIMARY_AMINE);
     }
-    public static boolean isSecondaryAmine(MoleculeWithAdjacencyList target) {
-        return countSubgraphs(SECONDARY_AMINE, target) > 0;
+    public static int isSecondaryAmine(MoleculeWithAdjacencyList target) {
+        return countSubgraphs(target, SECONDARY_AMINE);
     }
-    public static boolean isTertiaryAmine(MoleculeWithAdjacencyList target) {
-        return countSubgraphs(TERTIARY_AMINE, target) > 0;
+    public static int isTertiaryAmine(MoleculeWithAdjacencyList target) {
+        return countSubgraphs(target, TERTIARY_AMINE);
     }
-    public static boolean isPrimaryAromaticAmine(MoleculeWithAdjacencyList target){
-        return countSubgraphs(PRIMARY_AROMATIC_AMINE, target) > 0;
+    public static int isPrimaryAromaticAmine(MoleculeWithAdjacencyList target){
+        return countSubgraphs(target, PRIMARY_AROMATIC_AMINE);
     };
-    public static boolean isSecondaryAromaticAmine(MoleculeWithAdjacencyList target){
-        return countSubgraphs(SECONDARY_AROMATIC_AMINE, target) > 0;
-    };
-    public static boolean isTertiaryAromaticAmine(MoleculeWithAdjacencyList target){
-        return countSubgraphs(TERTIARY_AROMATIC_AMINE, target) > 0;
+    public static int isSecondaryAromaticAmine(MoleculeWithAdjacencyList target){
+        System.out.println("SECONDARY QUERY:");
+        for (int i = 0; i < SECONDARY_AROMATIC_AMINE.size(); i++) {
+            System.out.println(i + ": " + SECONDARY_AROMATIC_AMINE.getAtom(i));
+        }
+
+        return countSubgraphs(target, SECONDARY_AROMATIC_AMINE);
+    }
+    public static int isTertiaryAromaticAmine(MoleculeWithAdjacencyList target){
+        return countSubgraphs(target, TERTIARY_AROMATIC_AMINE);
     };
 
 }

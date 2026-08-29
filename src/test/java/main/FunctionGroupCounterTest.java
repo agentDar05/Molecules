@@ -17,7 +17,7 @@ public class FunctionGroupCounterTest {
         MoleculeWithAdjacencyList query = new MoleculeWithAdjacencyList();
         int o = query.addAtom((byte) 8);
 
-        assertEquals(0, FunctionGroupCounter.countSubgraphs(query, target));
+        assertEquals(0, FunctionGroupCounter.countSubgraphs(target, query));
     }
     @Test
     void countSubgraphs_twoOxygenAtoms() {
@@ -28,7 +28,7 @@ public class FunctionGroupCounterTest {
         MoleculeWithAdjacencyList query = new MoleculeWithAdjacencyList();
         query.addAtom((byte) 8);
 
-        assertEquals(2, FunctionGroupCounter.countSubgraphs(query, target));
+        assertEquals(2, FunctionGroupCounter.countSubgraphs(target, query));
     }
     @Test
     void countSubgraphs_anyAtomMatchesCarbon() {
@@ -38,7 +38,7 @@ public class FunctionGroupCounterTest {
         MoleculeWithAdjacencyList query = new MoleculeWithAdjacencyList();
         query.addAtom((byte) 0);
 
-        assertEquals(1, FunctionGroupCounter.countSubgraphs(query, target));
+        assertEquals(1, FunctionGroupCounter.countSubgraphs(target, query));
     }
     @Test
     void countSubgraphs_anyAtomMatchesAllAtoms() {
@@ -50,7 +50,7 @@ public class FunctionGroupCounterTest {
         MoleculeWithAdjacencyList query = new MoleculeWithAdjacencyList();
         query.addAtom((byte) 0);
 
-        assertEquals(3, FunctionGroupCounter.countSubgraphs(query, target));
+        assertEquals(3, FunctionGroupCounter.countSubgraphs(target, query));
     }
     @Test
     void countSubgraphs_anyAtomInBond() {
@@ -64,7 +64,7 @@ public class FunctionGroupCounterTest {
         int oxygen = query.addAtom((byte) 8);
         query.addBond(any, oxygen);
 
-        assertEquals(1, FunctionGroupCounter.countSubgraphs(query, target));
+        assertEquals(1, FunctionGroupCounter.countSubgraphs(target, query));
     }
     @Test
     void countSubgraphs_anyAtomButNoBond() {
@@ -77,7 +77,7 @@ public class FunctionGroupCounterTest {
         int o = query.addAtom((byte) 8);
         query.addBond(a, o);
 
-        assertEquals(0, FunctionGroupCounter.countSubgraphs(query, target));
+        assertEquals(0, FunctionGroupCounter.countSubgraphs(target, query));
     }
     @Test
     void countSubgraphs_twoOHGroups() {
@@ -96,7 +96,7 @@ public class FunctionGroupCounterTest {
         int h = query.addAtom((byte) 1);
         query.addBond(o, h);
 
-        assertEquals(2, FunctionGroupCounter.countSubgraphs(query, target));
+        assertEquals(2, FunctionGroupCounter.countSubgraphs(target, query));
     }
     @Test
     void countSubgraphs_moleculeMatchesItself() {
@@ -117,7 +117,7 @@ public class FunctionGroupCounterTest {
         target.addAtom((byte) 6);
 
         MoleculeWithAdjacencyList query = new MoleculeWithAdjacencyList();
-        assertThrows(IllegalArgumentException.class, ()-> FunctionGroupCounter.countSubgraphs(query, target));
+        assertThrows(IllegalArgumentException.class, ()-> FunctionGroupCounter.countSubgraphs(target, query));
     }
     @Test
     void countAlcohol_singleOH() {
@@ -131,7 +131,7 @@ public class FunctionGroupCounterTest {
         ohGroup.addBond(o2, h2);
         m.addBond(c, o);
         m.addBond(o, h);
-        int result = FunctionGroupCounter.countSubgraphs(ohGroup, m);
+        int result = FunctionGroupCounter.countSubgraphs(m, ohGroup);
         assertEquals(1, result);
     }
 
@@ -155,7 +155,7 @@ public class FunctionGroupCounterTest {
         int h = ohGroup.addAtom((byte) 1);
         ohGroup.addBond(c, o);
         ohGroup.addBond(o, h);
-        int result = FunctionGroupCounter.countSubgraphs(ohGroup, m);
+        int result = FunctionGroupCounter.countSubgraphs(m, ohGroup);
         assertEquals(2, result);
     }
 
@@ -177,7 +177,7 @@ public class FunctionGroupCounterTest {
         int qh = ohGroup.addAtom((byte) 1);
         ohGroup.addBond(qc, qo);
         ohGroup.addBond(qo, qh);
-        int result = FunctionGroupCounter.countSubgraphs(ohGroup, m);
+        int result = FunctionGroupCounter.countSubgraphs(m, ohGroup);
         assertEquals(0, result);
     }
 
@@ -201,7 +201,7 @@ public class FunctionGroupCounterTest {
         cooh.addBond(qc, qo1, BondType.DOUBLE);
         cooh.addBond(qc, qo2);
         cooh.addBond(qo2, qh);
-        int result = FunctionGroupCounter.countSubgraphs(cooh, m);
+        int result = FunctionGroupCounter.countSubgraphs(m, cooh);
         assertEquals(1, result);
     }
 
@@ -219,7 +219,7 @@ public class FunctionGroupCounterTest {
         cooh.addBond(qc, qo1, BondType.DOUBLE);
         cooh.addBond(qc, qo2);
         cooh.addBond(qo2, qh);
-        assertThrows(IllegalArgumentException.class, () -> FunctionGroupCounter.countSubgraphs(cooh, m));
+        assertThrows(IllegalArgumentException.class, () -> FunctionGroupCounter.countSubgraphs(m, cooh));
     }
 
     @Test
@@ -281,5 +281,57 @@ public class FunctionGroupCounterTest {
         phenyl.addBond(c6_phenyl, a_phenyl, BondType.SINGLE);
         assertEquals(1, FunctionGroupCounter.countPhenyl(phenyl));
 
+    }
+    @Test
+    void primary_amine() throws IOException {
+        InputStream is = FunctionGroupCounter.class
+                .getClassLoader()
+                .getResourceAsStream("primary.mol");
+
+        assertEquals(1, FunctionGroupCounter.isPrimaryAmine((MoleculeWithAdjacencyList) MolV3000.read(is)));
+
+    }
+    @Test
+    void secondary_amine() throws IOException {
+        InputStream is = FunctionGroupCounter.class
+                .getClassLoader()
+                .getResourceAsStream("secondary.mol");
+
+        assertEquals(1, FunctionGroupCounter.isSecondaryAmine((MoleculeWithAdjacencyList) MolV3000.read(is)));
+
+    }
+    @Test
+    void tertiary_amine() throws IOException {
+        InputStream is = FunctionGroupCounter.class
+                .getClassLoader()
+                .getResourceAsStream("tertiary.mol");
+
+        assertEquals(1, FunctionGroupCounter.isTertiaryAmine((MoleculeWithAdjacencyList) MolV3000.read(is)));
+
+    }
+    @Test
+    void primary_aromatic_amine() throws IOException {
+        InputStream is = FunctionGroupCounter.class
+                .getClassLoader()
+                .getResourceAsStream("primary_aromatic.mol");
+        assertEquals(1, FunctionGroupCounter.isPrimaryAromaticAmine((MoleculeWithAdjacencyList) MolV3000.read(is)));
+
+    }
+    @Test
+    void secondary_aromatic_amine() throws IOException {
+        InputStream is = FunctionGroupCounter.class
+                .getClassLoader()
+                .getResourceAsStream("secondary_aromatic.mol");
+
+        assertEquals(1, FunctionGroupCounter.isSecondaryAromaticAmine((MoleculeWithAdjacencyList) MolV3000.read(is)));
+
+    }
+    @Test
+    void tertiary_aromatic_amine() throws IOException {
+        InputStream is = FunctionGroupCounter.class
+                .getClassLoader()
+                .getResourceAsStream("tertiary_aromatic.mol");
+
+        assertEquals(1, FunctionGroupCounter.isTertiaryAromaticAmine((MoleculeWithAdjacencyList) MolV3000.read(is)));
     }
 }
