@@ -1,26 +1,40 @@
 package perf;
 
-import main.Molecules;
+import main.MolV3000;
 import org.openjdk.jmh.annotations.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
+@Warmup(iterations = 3, time = 5)
+@Measurement(iterations = 3, time = 5)
+@Fork(1)
 public class MoleculesParserBenchmark {
-
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         org.openjdk.jmh.Main.main(new String[]{"MoleculesParserBenchmark"});
     }
-
-    @Benchmark
-    @Warmup(iterations = 3, time = 5)
-    @Measurement(iterations = 3, time = 5)
-    @Fork(1)
-    public void test1(Data data) {
-        data.m.parse("H3PO4Cl100OOHZnTmSUPtAl");
-    } // H4 P1 O6 Cl100 Zn Tm S U Pt Al
-
     @State(Scope.Benchmark)
-    public static class Data {
-        final Molecules m = new Molecules();
+    public static class BenchmarkState {
+        byte[] data;
+        @Setup
+        public void setup() throws IOException {
+            InputStream is = MoleculesParserBenchmark.class
+                    .getClassLoader()
+                    .getResourceAsStream("ketcher.mol");
+
+            if (is == null) {
+                throw new RuntimeException("File not found: ketcher.mol");
+            }
+
+            data = is.readAllBytes();
+            is.close();
+        }
     }
+    @Benchmark
+    public void MolV3000ReaderBench(BenchmarkState state) throws IOException {
+        InputStream is = new ByteArrayInputStream(state.data);
+        MolV3000.read(is);
+    }
+
 }
